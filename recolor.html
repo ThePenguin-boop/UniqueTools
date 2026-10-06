@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brightness-Preserving Image Recolor</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #181818;
+        color: #eee;
+    }
+
+    header {
+        padding: 28px 30px 10px;
+        text-align: center;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    header p {
+        margin: 8px 0 0;
+        color: #aaa;
+    }
+
+    .app {
+        width: min(1200px, calc(100% - 30px));
+        margin: 25px auto 50px;
+    }
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+        padding: 18px;
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 14px;
+        margin-bottom: 18px;
+    }
+
+    .control-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    label {
+        color: #bbb;
+        font-size: 14px;
+    }
+
+    input[type="color"] {
+        width: 54px;
+        height: 40px;
+        padding: 3px;
+        border: 1px solid #555;
+        border-radius: 8px;
+        background: #111;
+        cursor: pointer;
+    }
+
+    input[type="range"] {
+        width: 170px;
+        accent-color: #aaa;
+        cursor: pointer;
+    }
+
+    button {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 16px;
+        background: #eee;
+        color: #111;
+        font-weight: 650;
+        cursor: pointer;
+        transition: transform 0.1s, opacity 0.1s;
+    }
+
+    button:hover {
+        opacity: .9;
+    }
+
+    button:active {
+        transform: scale(.97);
+    }
+
+    button.secondary {
+        background: #333;
+        color: #eee;
+    }
+
+    .drop-zone {
+        border: 2px dashed #555;
+        border-radius: 14px;
+        min-height: 170px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        cursor: pointer;
+        background: #202020;
+        transition: .15s;
+        margin-bottom: 20px;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+        border-color: #aaa;
+        background: #282828;
+    }
+
+    .drop-content {
+        pointer-events: none;
+    }
+
+    .drop-icon {
+        font-size: 38px;
+        margin-bottom: 8px;
+    }
+
+    .drop-zone strong {
+        display: block;
+        font-size: 17px;
+    }
+
+    .drop-zone span {
+        color: #888;
+        font-size: 13px;
+    }
+
+    #fileInput {
+        display: none;
+    }
+
+    .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 18px;
+    }
+
+    .card {
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+        padding: 12px 14px;
+        border-bottom: 1px solid #333;
+    }
+
+    .filename {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+        color: #ccc;
+    }
+
+    .images {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: #333;
+    }
+
+    .image-panel {
+        position: relative;
+        background: #111;
+        min-height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-panel img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 400px;
+        object-fit: contain;
+    }
+
+    .panel-label {
+        position: absolute;
+        top: 7px;
+        left: 7px;
+        padding: 3px 7px;
+        border-radius: 5px;
+        background: rgba(0,0,0,.65);
+        font-size: 11px;
+        color: #ddd;
+        z-index: 2;
+    }
+
+    .card-footer {
+        padding: 12px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .card-footer button {
+        flex: 1;
+    }
+
+    .empty {
+        text-align: center;
+        color: #666;
+        padding: 50px 20px;
+    }
+
+    .value {
+        min-width: 45px;
+        color: #ddd;
+        font-size: 13px;
+    }
+
+    @media (max-width: 650px) {
+        .controls {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .control-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        input[type="range"] {
+            flex: 1;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎨 Brightness-Preserving Recolor</h1>
+    <p>Change the color while keeping the original light and dark structure.</p>
+</header>
+
+<div class="app">
+
+    <div class="controls">
+
+        <div class="control-group">
+            <label for="colorPicker">Color</label>
+            <input type="color" id="colorPicker" value="#ff0000">
+        </div>
+
+        <div class="control-group">
+            <label for="strength">Strength</label>
+            <input type="range" id="strength"
+                   min="0" max="100" value="100">
+            <span class="value" id="strengthValue">100%</span>
+        </div>
+
+        <button id="downloadAll" class="secondary">
+            Download All
+        </button>
+
+        <button id="clearAll" class="secondary">
+            Clear
+        </button>
+
+    </div>
+
+    <div class="drop-zone" id="dropZone">
+        <div class="drop-content">
+            <div class="drop-icon">🖼️</div>
+            <strong>Drop PNG or JPG images here</strong>
+            <span>or click to browse</span>
+        </div>
+    </div>
+
+    <input
+        type="file"
+        id="fileInput"
+        accept="image/png,image/jpeg,image/jpg"
+        multiple
+    >
+
+    <div id="gallery" class="gallery">
+        <div class="empty" id="emptyMessage">
+            Your images will appear here.
+        </div>
+    </div>
+
+</div>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const dropZone = document.getElementById("dropZone");
+const gallery = document.getElementById("gallery");
+const colorPicker = document.getElementById("colorPicker");
+const strengthSlider = document.getElementById("strength");
+const strengthValue = document.getElementById("strengthValue");
+const downloadAll = document.getElementById("downloadAll");
+const clearAll = document.getElementById("clearAll");
+
+let images = [];
+
+
+// ---------------------------------------------------------
+// UI
+// ---------------------------------------------------------
+
+strengthSlider.addEventListener("input", () => {
+    strengthValue.textContent = strengthSlider.value + "%";
+    recolorEverything();
+});
+
+colorPicker.addEventListener("input", recolorEverything);
+
+dropZone.addEventListener("click", () => {
+    fileInput.click();
+});
+
+fileInput.addEventListener("change", event => {
+    addFiles(event.target.files);
+    fileInput.value = "";
+});
+
+dropZone.addEventListener("dragover", event => {
+    event.preventDefault();
+    dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", event => {
+    event.preventDefault();
+    dropZone.classList.remove("dragover");
+
+    addFiles(event.dataTransfer.files);
+});
+
+clearAll.addEventListener("click", () => {
+    images.forEach(item => {
+        if (item.url) URL.revokeObjectURL(item.url);
+    });
+
+    images = [];
+    gallery.innerHTML = `
+        <div class="empty" id="emptyMessage">
+            Your images will appear here.
+        </div>
+    `;
+});
+
+
+// ---------------------------------------------------------
+// Add images
+// ---------------------------------------------------------
+
+function addFiles(fileList) {
+
+    const files = [...fileList].filter(file =>
+        file.type === "image/png" ||
+        file.type === "image/jpeg"
+    );
+
+    for (const file of files) {
+
+        const url = URL.createObjectURL(file);
+
+        const item = {
+            file,
+            url,
+            image: null,
+            canvas: document.createElement("canvas"),
+            resultURL: null
+        };
+
+        images.push(item);
+        createCard(item);
+    }
+}
+
+
+// ---------------------------------------------------------
+// Create preview card
+// ---------------------------------------------------------
+
+function createCard(item) {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+        <div class="card-header">
+            <div class="filename" title="${escapeHTML(item.file.name)}">
+                ${escapeHTML(item.file.name)}
+            </div>
+        </div>
+
+        <div class="images">
+
+            <div class="image-panel">
+                <div class="panel-label">Original</div>
+                <img class="original">
+            </div>
+
+            <div class="image-panel">
+                <div class="panel-label">Recolored</div>
+                <img class="result">
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+            <button class="download">Download PNG</button>
+            <button class="remove secondary">Remove</button>
+        </div>
+    `;
+
+    gallery.appendChild(card);
+
+    const originalImg = card.querySelector(".original");
+    const resultImg = card.querySelector(".result");
+    const downloadButton = card.querySelector(".download");
+    const removeButton = card.querySelector(".remove");
+
+    originalImg.src = item.url;
+
+    item.image = new Image();
+
+    item.image.onload = () => {
+        item.canvas.width = item.image.naturalWidth;
+        item.canvas.height = item.image.naturalHeight;
+
+        recolorImage(item);
+    };
+
+    item.image.src = item.url;
+
+    downloadButton.addEventListener("click", () => {
+        downloadResult(item);
+    });
+
+    removeButton.addEventListener("click", () => {
+
+        if (item.resultURL) {
+            URL.revokeObjectURL(item.resultURL);
+        }
+
+        URL.revokeObjectURL(item.url);
+
+        images = images.filter(x => x !== item);
+        card.remove();
+
+        if (images.length === 0) {
+            gallery.innerHTML = `
+                <div class="empty">
+                    Your images will appear here.
+                </div>
+            `;
+        }
+    });
+
+    item.card = card;
+    item.resultImg = resultImg;
+}
+
+
+// ---------------------------------------------------------
+// Recolor everything
+// ---------------------------------------------------------
+
+function recolorEverything() {
+
+    for (const item of images) {
+        if (item.image && item.image.complete) {
+            recolorImage(item);
+        }
+    }
+}
+
+
+// ---------------------------------------------------------
+// Main recoloring algorithm
+//
+// We convert each pixel from RGB -> HSL.
+// The TARGET hue is substituted,
+// while the ORIGINAL lightness is preserved.
+//
+// This is the important part that prevents the image
+// from simply becoming a flat colored overlay.
+// ---------------------------------------------------------
+
+function recolorImage(item) {
+
+    const canvas = item.canvas;
+    const ctx = canvas.getContext("2d", {
+        willReadFrequently: true
+    });
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.drawImage(item.image, 0, 0);
+
+    const imageData = ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const data = imageData.data;
+
+    const target = hexToHSL(colorPicker.value);
+
+    // 0 = original image
+    // 100 = full recolor
+    const strength = Number(strengthSlider.value) / 100;
+
+    for (let i = 0; i < data.length; i += 4) {
+
+        const r = data[i] / 255;
+        const g = data[i + 1] / 255;
+        const b = data[i + 2] / 255;
+
+        // Keep transparency untouched
+        const alpha = data[i + 3];
+
+        if (alpha === 0) {
+            continue;
+        }
+
+        const original = rgbToHSL(r, g, b);
+
+        /*
+         * Preserve original lightness.
+         *
+         * We also interpolate saturation rather than forcing
+         * every pixel to maximum saturation. This gives much
+         * more natural results across photographs.
+         */
+
+        const newHue =
+            lerpHue(original.h, target.h, strength);
+
+        const newSaturation =
+            original.s * (1 - strength) +
+            target.s * strength;
+
+        const newLightness =
+            original.l;
+
+        const rgb = hslToRGB(
+            newHue,
+            newSaturation,
+            newLightness
+        );
+
+        data[i]     = Math.round(rgb.r * 255);
+        data[i + 1] = Math.round(rgb.g * 255);
+        data[i + 2] = Math.round(rgb.b * 255);
+        data[i + 3] = alpha;
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    updateResultPreview(item);
+}
+
+
+// ---------------------------------------------------------
+// Preview
+// ---------------------------------------------------------
+
+function updateResultPreview(item) {
+
+    if (item.resultURL) {
+        URL.revokeObjectURL(item.resultURL);
+    }
+
+    item.canvas.toBlob(blob => {
+
+        if (!blob) return;
+
+        item.resultURL = URL.createObjectURL(blob);
+        item.resultImg.src = item.resultURL;
+
+    }, "image/png");
+}
+
+
+// ---------------------------------------------------------
+// Download
+// ---------------------------------------------------------
+
+function downloadResult(item) {
+
+    item.canvas.toBlob(blob => {
+
+        if (!blob) return;
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        const originalName =
+            item.file.name.replace(/\.[^/.]+$/, "");
+
+        a.href = url;
+        a.download = originalName + "_recolored.png";
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 1000);
+
+    }, "image/png");
+}
+
+
+downloadAll.addEventListener("click", async () => {
+
+    if (images.length === 0) return;
+
+    for (const item of images) {
+        downloadResult(item);
+
+        // Tiny delay prevents browsers from treating a large
+        // batch of downloads as one accidental popup.
+        await sleep(150);
+    }
+});
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+// ---------------------------------------------------------
+// Color conversion
+// ---------------------------------------------------------
+
+function rgbToHSL(r, g, b) {
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+
+    let h = 0;
+    let s = 0;
+
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+
+        const d = max - min;
+
+        s = l > 0.5
+            ? d / (2 - max - min)
+            : d / (max + min);
+
+        switch (max) {
+
+            case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+
+            case g:
+                h = (b - r) / d + 2;
+                break;
+
+            case b:
+                h = (r - g) / d + 4;
+                break;
+        }
+
+        h /= 6;
+    }
+
+    return { h, s, l };
+}
+
+
+function hslToRGB(h, s, l) {
+
+    let r, g, b;
+
+    if (s === 0) {
+
+        r = g = b = l;
+
+    } else {
+
+        const q = l < 0.5
+            ? l * (1 + s)
+            : l + s - l * s;
+
+        const p = 2 * l - q;
+
+        r = hueToRGB(p, q, h + 1 / 3);
+        g = hueToRGB(p, q, h);
+        b = hueToRGB(p, q, h - 1 / 3);
+    }
+
+    return { r, g, b };
+}
+
+
+function hueToRGB(p, q, t) {
+
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+
+    if (t < 1 / 6)
+        return p + (q - p) * 6 * t;
+
+    if (t < 1 / 2)
+        return q;
+
+    if (t < 2 / 3)
+        return p + (q - p) * (2 / 3 - t) * 6;
+
+    return p;
+}
+
+
+function hexToHSL(hex) {
+
+    hex = hex.replace("#", "");
+
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+    return rgbToHSL(r, g, b);
+}
+
+
+// ---------------------------------------------------------
+// Hue interpolation
+// ---------------------------------------------------------
+
+function lerpHue(a, b, amount) {
+
+    let difference = b - a;
+
+    if (difference > 0.5)
+        difference -= 1;
+
+    if (difference < -0.5)
+        difference += 1;
+
+    let result = a + difference * amount;
+
+    if (result < 0)
+        result += 1;
+
+    if (result > 1)
+        result -= 1;
+
+    return result;
+}
+
+
+// ---------------------------------------------------------
+// HTML escaping
+// ---------------------------------------------------------
+
+function escapeHTML(text) {
+
+    return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+</script>
+
+</body>
+</html>
