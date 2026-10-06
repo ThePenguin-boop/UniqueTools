@@ -1,0 +1,466 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>My Tools</title>
+
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: #151515;
+
+    color: #eee;
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+header {
+
+    text-align: center;
+
+    padding:
+        50px
+        20px
+        30px;
+}
+
+
+header h1 {
+
+    margin: 0;
+
+    font-size: 42px;
+
+    font-weight: 750;
+
+}
+
+
+header p {
+
+    margin:
+        10px 0 0;
+
+    color: #999;
+
+    font-size: 16px;
+
+}
+
+
+/* =========================================
+   TOOL GRID
+   ========================================= */
+
+.tools {
+
+    width:
+        min(
+            1100px,
+            calc(100% - 30px)
+        );
+
+    margin:
+        0 auto 60px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(260px, 1fr)
+        );
+
+    gap: 20px;
+
+}
+
+
+/* =========================================
+   TOOL CARD
+   ========================================= */
+
+.tool {
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-height: 230px;
+
+    padding: 25px;
+
+    border-radius: 16px;
+
+    background: #222;
+
+    border:
+        1px solid
+        #333;
+
+    text-decoration: none;
+
+    color: #eee;
+
+    transition:
+        transform .15s,
+        background .15s,
+        border-color .15s;
+
+}
+
+
+.tool:hover {
+
+    transform:
+        translateY(-4px);
+
+    background: #292929;
+
+    border-color: #555;
+
+}
+
+
+.icon {
+
+    font-size: 45px;
+
+    line-height: 1;
+
+    margin-bottom: 18px;
+
+}
+
+
+.tool h2 {
+
+    margin:
+        0 0 8px;
+
+    font-size: 21px;
+
+}
+
+
+.tool p {
+
+    margin: 0;
+
+    color: #999;
+
+    line-height: 1.5;
+
+    flex: 1;
+
+}
+
+
+/* =========================================
+   OPEN BUTTON
+   ========================================= */
+
+.open-button {
+
+    display: inline-block;
+
+    margin-top: 20px;
+
+    padding:
+        10px
+        15px;
+
+    width: fit-content;
+
+    border-radius: 8px;
+
+    background: #eee;
+
+    color: #111;
+
+    font-weight: 650;
+
+}
+
+
+/* =========================================
+   EMPTY STATE
+   ========================================= */
+
+.empty {
+
+    grid-column: 1 / -1;
+
+    text-align: center;
+
+    color: #666;
+
+    padding: 50px;
+
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+footer {
+
+    text-align: center;
+
+    color: #666;
+
+    font-size: 13px;
+
+    padding-bottom: 30px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <h1>🛠️ My Tools</h1>
+
+    <p>
+        A collection of my browser-based tools
+    </p>
+
+</header>
+
+
+
+<main
+    class="tools"
+    id="toolGrid"
+></main>
+
+
+
+<footer>
+
+    My personal browser tools
+
+</footer>
+
+
+
+<script>
+
+/*
+============================================================
+                ADD YOUR TOOLS HERE
+============================================================
+
+To add another tool, copy one of these objects:
+
+{
+    name: "Tool Name",
+    file: "tool-file.html",
+    icon: "🔧",
+    description: "What the tool does."
+},
+
+Then paste it into the list.
+
+That's it.
+
+Example:
+
+{
+    name: "PNG Compressor",
+    file: "compressor.html",
+    icon: "📦",
+    description: "Compress PNG images."
+}
+
+Make sure the HTML file is in the SAME folder
+as this index.html file.
+
+============================================================
+*/
+
+
+const tools = [
+
+    {
+        name: "Image Recolor",
+        file: "recolor.html",
+        icon: "🎨",
+        description:
+            "Upload PNG or JPG images and recolor them while preserving their original brightness."
+    },
+
+
+    {
+        name: "Image Opacity",
+        file: "opacity.html",
+        icon: "🎚️",
+        description:
+            "Adjust the overall transparency of an image and export it as a transparent PNG."
+    },
+
+
+    {
+        name: "SVG Color Inverter",
+        file: "svg-inverter.html",
+        icon: "🔄",
+        description:
+            "Upload an SVG and invert its colors while keeping its geometry and transparency intact."
+    }
+
+];
+
+
+
+/*
+============================================================
+                BUILD THE PAGE
+============================================================
+*/
+
+const toolGrid =
+    document.getElementById("toolGrid");
+
+
+function createTools() {
+
+    toolGrid.innerHTML = "";
+
+
+    /*
+     * If there are no tools, show a message.
+     */
+
+    if (tools.length === 0) {
+
+        toolGrid.innerHTML = `
+            <div class="empty">
+                No tools have been added yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /*
+     * Create a card for every tool.
+     */
+
+    tools.forEach(tool => {
+
+        const card =
+            document.createElement("a");
+
+
+        card.className =
+            "tool";
+
+
+        card.href =
+            tool.file;
+
+
+        card.innerHTML = `
+
+            <div class="icon">
+                ${tool.icon}
+            </div>
+
+            <h2>
+                ${escapeHTML(tool.name)}
+            </h2>
+
+            <p>
+                ${escapeHTML(tool.description)}
+            </p>
+
+            <span class="open-button">
+                Open Tool →
+            </span>
+
+        `;
+
+
+        toolGrid.appendChild(card);
+
+    });
+
+}
+
+
+/*
+============================================================
+                SAFETY
+============================================================
+*/
+
+function escapeHTML(text) {
+
+    return String(text)
+
+        .replaceAll("&", "&amp;")
+
+        .replaceAll("<", "&lt;")
+
+        .replaceAll(">", "&gt;")
+
+        .replaceAll('"', "&quot;")
+
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/*
+============================================================
+                START
+============================================================
+*/
+
+createTools();
+
+</script>
+
+
+</body>
+
+</html>
+```
