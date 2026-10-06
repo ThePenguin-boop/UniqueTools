@@ -1,0 +1,592 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Image Opacity Tool</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: #181818;
+        color: #eee;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    header {
+        text-align: center;
+        padding: 30px 20px 15px;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 28px;
+    }
+
+    header p {
+        color: #999;
+        margin-top: 8px;
+    }
+
+    .app {
+        width: min(1000px, calc(100% - 30px));
+        margin: 20px auto 50px;
+    }
+
+    /* Upload area */
+
+    .drop-zone {
+        min-height: 180px;
+        border: 2px dashed #555;
+        border-radius: 14px;
+        background: #202020;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        text-align: center;
+        cursor: pointer;
+
+        transition: .15s;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+        background: #292929;
+        border-color: #aaa;
+    }
+
+    .drop-icon {
+        font-size: 40px;
+        margin-bottom: 8px;
+    }
+
+    .drop-zone strong {
+        display: block;
+        font-size: 17px;
+    }
+
+    .drop-zone span {
+        color: #888;
+        font-size: 13px;
+    }
+
+    #fileInput {
+        display: none;
+    }
+
+    /* Controls */
+
+    .controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+
+        margin-top: 18px;
+        padding: 18px;
+
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 14px;
+    }
+
+    .controls label {
+        color: #bbb;
+        font-size: 14px;
+    }
+
+    #opacitySlider {
+        width: 260px;
+        accent-color: #aaa;
+    }
+
+    #opacityValue {
+        min-width: 50px;
+        font-weight: 600;
+    }
+
+    button {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 16px;
+
+        background: #eee;
+        color: #111;
+
+        font-weight: 650;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: .9;
+    }
+
+    button.secondary {
+        background: #333;
+        color: #eee;
+    }
+
+    /* Preview */
+
+    .preview-container {
+        margin-top: 18px;
+
+        background-color: #aaa;
+
+        /*
+           Checkerboard transparency pattern
+        */
+        background-image:
+            linear-gradient(45deg, #ccc 25%, transparent 25%),
+            linear-gradient(-45deg, #ccc 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #ccc 75%),
+            linear-gradient(-45deg, transparent 75%, #ccc 75%);
+
+        background-size: 30px 30px;
+
+        background-position:
+            0 0,
+            0 15px,
+            15px -15px,
+            -15px 0;
+
+        border-radius: 14px;
+        overflow: hidden;
+
+        min-height: 400px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #preview {
+        display: block;
+
+        max-width: 100%;
+        max-height: 650px;
+
+        object-fit: contain;
+    }
+
+    .empty {
+        color: #666;
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    /* Download */
+
+    .download-area {
+        margin-top: 15px;
+
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 600px) {
+
+        .controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        #opacitySlider {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎚️ Image Opacity Tool</h1>
+    <p>Adjust the transparency of an entire image.</p>
+</header>
+
+<div class="app">
+
+    <!-- Upload -->
+
+    <div class="drop-zone" id="dropZone">
+
+        <div>
+            <div class="drop-icon">🖼️</div>
+
+            <strong>
+                Drop an image here
+            </strong>
+
+            <span>
+                or click to browse
+            </span>
+        </div>
+
+    </div>
+
+    <input
+        type="file"
+        id="fileInput"
+        accept="image/png,image/jpeg,image/jpg"
+    >
+
+    <!-- Controls -->
+
+    <div class="controls">
+
+        <label for="opacitySlider">
+            Image Opacity
+        </label>
+
+        <input
+            type="range"
+            id="opacitySlider"
+            min="0"
+            max="100"
+            value="100"
+        >
+
+        <span id="opacityValue">
+            100%
+        </span>
+
+        <button
+            id="resetButton"
+            class="secondary"
+        >
+            Reset
+        </button>
+
+    </div>
+
+    <!-- Preview -->
+
+    <div class="preview-container">
+
+        <div
+            class="empty"
+            id="emptyMessage"
+        >
+            Upload an image to preview it.
+        </div>
+
+        <canvas
+            id="preview"
+            style="display:none;"
+        ></canvas>
+
+    </div>
+
+    <!-- Download -->
+
+    <div
+        class="download-area"
+        id="downloadArea"
+        style="display:none;"
+    >
+
+        <button id="downloadButton">
+            💾 Download PNG
+        </button>
+
+        <button
+            id="newImageButton"
+            class="secondary"
+        >
+            Upload Another
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const fileInput =
+    document.getElementById("fileInput");
+
+const dropZone =
+    document.getElementById("dropZone");
+
+const opacitySlider =
+    document.getElementById("opacitySlider");
+
+const opacityValue =
+    document.getElementById("opacityValue");
+
+const resetButton =
+    document.getElementById("resetButton");
+
+const newImageButton =
+    document.getElementById("newImageButton");
+
+const downloadButton =
+    document.getElementById("downloadButton");
+
+const preview =
+    document.getElementById("preview");
+
+const ctx =
+    preview.getContext("2d");
+
+const emptyMessage =
+    document.getElementById("emptyMessage");
+
+const downloadArea =
+    document.getElementById("downloadArea");
+
+
+let originalImage = null;
+
+let originalFileName = "image";
+
+let originalImageData = null;
+
+
+// ---------------------------------------------------------
+// Upload
+// ---------------------------------------------------------
+
+dropZone.addEventListener("click", () => {
+    fileInput.click();
+});
+
+
+fileInput.addEventListener("change", event => {
+
+    if (event.target.files.length > 0) {
+        loadImage(event.target.files[0]);
+    }
+
+});
+
+
+dropZone.addEventListener("dragover", event => {
+
+    event.preventDefault();
+
+    dropZone.classList.add("dragover");
+
+});
+
+
+dropZone.addEventListener("dragleave", () => {
+
+    dropZone.classList.remove("dragover");
+
+});
+
+
+dropZone.addEventListener("drop", event => {
+
+    event.preventDefault();
+
+    dropZone.classList.remove("dragover");
+
+    const files = event.dataTransfer.files;
+
+    if (files.length > 0) {
+        loadImage(files[0]);
+    }
+
+});
+
+
+// ---------------------------------------------------------
+// Load image
+// ---------------------------------------------------------
+
+function loadImage(file) {
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please choose a PNG or JPG image.");
+        return;
+    }
+
+    originalFileName =
+        file.name.replace(/\.[^/.]+$/, "");
+
+    const reader = new FileReader();
+
+    reader.onload = event => {
+
+        const image = new Image();
+
+        image.onload = () => {
+
+            originalImage = image;
+
+            preview.width = image.naturalWidth;
+            preview.height = image.naturalHeight;
+
+            emptyMessage.style.display = "none";
+
+            preview.style.display = "block";
+
+            downloadArea.style.display = "flex";
+
+            opacitySlider.value = 100;
+
+            opacityValue.textContent = "100%";
+
+            drawImage();
+
+        };
+
+        image.src = event.target.result;
+
+    };
+
+    reader.readAsDataURL(file);
+}
+
+
+// ---------------------------------------------------------
+// Change opacity
+// ---------------------------------------------------------
+
+opacitySlider.addEventListener("input", () => {
+
+    const value =
+        Number(opacitySlider.value);
+
+    opacityValue.textContent =
+        value + "%";
+
+    drawImage();
+
+});
+
+
+// ---------------------------------------------------------
+// Draw image with opacity
+// ---------------------------------------------------------
+
+function drawImage() {
+
+    if (!originalImage) {
+        return;
+    }
+
+    ctx.clearRect(
+        0,
+        0,
+        preview.width,
+        preview.height
+    );
+
+    /*
+       IMPORTANT:
+
+       globalAlpha multiplies the existing alpha
+       channel instead of destroying it.
+
+       Example:
+
+       Original pixel = 50% transparent
+
+       Slider = 50%
+
+       Result = 25% opacity
+    */
+
+    ctx.globalAlpha =
+        Number(opacitySlider.value) / 100;
+
+    ctx.drawImage(
+        originalImage,
+        0,
+        0
+    );
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+// ---------------------------------------------------------
+// Reset
+// ---------------------------------------------------------
+
+resetButton.addEventListener("click", () => {
+
+    opacitySlider.value = 100;
+
+    opacityValue.textContent = "100%";
+
+    drawImage();
+
+});
+
+
+// ---------------------------------------------------------
+// Download
+// ---------------------------------------------------------
+
+downloadButton.addEventListener("click", () => {
+
+    if (!originalImage) {
+        return;
+    }
+
+    preview.toBlob(blob => {
+
+        if (!blob) {
+            return;
+        }
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        link.href = url;
+
+        link.download =
+            originalFileName +
+            "_opacity.png";
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 1000);
+
+    }, "image/png");
+
+});
+
+
+// ---------------------------------------------------------
+// Upload another
+// ---------------------------------------------------------
+
+newImageButton.addEventListener("click", () => {
+
+    fileInput.click();
+
+});
+
+</script>
+
+</body>
+</html>
+```
