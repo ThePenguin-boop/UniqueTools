@@ -7,230 +7,213 @@
 <title>SVG Color Inverter</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    body {
-        margin: 0;
-        min-height: 100vh;
-        background: #181818;
-        color: #eee;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #181818;
+    color: #eee;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-    header {
-        text-align: center;
-        padding: 30px 20px 15px;
-    }
+header {
+    text-align: center;
+    padding: 30px 20px 15px;
+}
 
-    h1 {
-        margin: 0;
-        font-size: 28px;
-    }
+h1 {
+    margin: 0;
+    font-size: 28px;
+}
 
-    header p {
-        margin: 8px 0 0;
-        color: #999;
-    }
+header p {
+    margin: 8px 0 0;
+    color: #999;
+}
 
-    .app {
-        width: min(1100px, calc(100% - 30px));
-        margin: 20px auto 50px;
-    }
+.app {
+    width: min(1100px, calc(100% - 30px));
+    margin: 20px auto 50px;
+}
 
-    /* =========================
-       Upload
-       ========================= */
+/* =========================
+   Upload
+   ========================= */
 
-    .drop-zone {
-        min-height: 180px;
+.drop-zone {
+    min-height: 180px;
+    border: 2px dashed #555;
+    border-radius: 14px;
+    background: #202020;
 
-        border: 2px dashed #555;
-        border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        background: #202020;
+    text-align: center;
+    cursor: pointer;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    transition: 0.15s;
+}
 
-        text-align: center;
+.drop-zone:hover,
+.drop-zone.dragover {
+    background: #292929;
+    border-color: #aaa;
+}
 
-        cursor: pointer;
+.drop-icon {
+    font-size: 42px;
+    margin-bottom: 8px;
+}
 
-        transition: 0.15s;
-    }
+.drop-zone strong {
+    display: block;
+    font-size: 17px;
+}
 
-    .drop-zone:hover,
-    .drop-zone.dragover {
-        background: #292929;
-        border-color: #aaa;
-    }
+.drop-zone span {
+    display: block;
+    margin-top: 5px;
+    color: #888;
+    font-size: 13px;
+}
 
-    .drop-icon {
-        font-size: 42px;
-        margin-bottom: 8px;
-    }
+#fileInput {
+    display: none;
+}
 
-    .drop-zone strong {
-        display: block;
-        font-size: 17px;
-    }
+/* =========================
+   Preview
+   ========================= */
 
-    .drop-zone span {
-        display: block;
-        margin-top: 5px;
-        color: #888;
-        font-size: 13px;
-    }
+.preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 18px;
+}
 
-    #fileInput {
-        display: none;
-    }
+.preview-box {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 14px;
+    overflow: hidden;
+}
 
-    /* =========================
-       Preview
-       ========================= */
+.preview-title {
+    padding: 12px 15px;
+    border-bottom: 1px solid #333;
+    font-size: 14px;
+    font-weight: 650;
+    color: #ccc;
+}
+
+.svg-preview {
+    min-height: 400px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background-color: #888;
+
+    background-image:
+        linear-gradient(45deg, #aaa 25%, transparent 25%),
+        linear-gradient(-45deg, #aaa 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #aaa 75%),
+        linear-gradient(-45deg, transparent 75%, #aaa 75%);
+
+    background-size: 30px 30px;
+
+    background-position:
+        0 0,
+        0 15px,
+        15px -15px,
+        -15px 0;
+}
+
+.svg-preview img {
+    display: block;
+    max-width: 100%;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+}
+
+.empty {
+    color: #666;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+/* =========================
+   Buttons
+   ========================= */
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+button {
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 18px;
+    background: #eee;
+    color: #111;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button.secondary {
+    background: #333;
+    color: #eee;
+}
+
+/* =========================
+   File info
+   ========================= */
+
+.file-info {
+    margin-top: 15px;
+    padding: 12px 15px;
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 10px;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+}
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (max-width: 700px) {
 
     .preview-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-
-        margin-top: 18px;
-    }
-
-    .preview-box {
-        background: #222;
-        border: 1px solid #333;
-        border-radius: 14px;
-        overflow: hidden;
-    }
-
-    .preview-title {
-        padding: 12px 15px;
-        border-bottom: 1px solid #333;
-
-        font-size: 14px;
-        font-weight: 650;
-        color: #ccc;
+        grid-template-columns: 1fr;
     }
 
     .svg-preview {
-        min-height: 400px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 20px;
-
-        /*
-         * Checkerboard lets transparent SVGs
-         * remain visibly transparent.
-         */
-        background-color: #888;
-
-        background-image:
-            linear-gradient(45deg, #aaa 25%, transparent 25%),
-            linear-gradient(-45deg, #aaa 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, #aaa 75%),
-            linear-gradient(-45deg, transparent 75%, #aaa 75%);
-
-        background-size: 30px 30px;
-
-        background-position:
-            0 0,
-            0 15px,
-            15px -15px,
-            -15px 0;
+        min-height: 300px;
     }
-
-    .svg-preview img {
-        display: block;
-
-        max-width: 100%;
-        max-height: 600px;
-
-        width: auto;
-        height: auto;
-    }
-
-    .empty {
-        color: #666;
-        text-align: center;
-        padding: 50px 20px;
-    }
-
-    /* =========================
-       Buttons
-       ========================= */
-
-    .controls {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-
-        margin-top: 18px;
-    }
-
-    button {
-        border: 0;
-        border-radius: 8px;
-
-        padding: 11px 18px;
-
-        background: #eee;
-        color: #111;
-
-        font-weight: 650;
-
-        cursor: pointer;
-    }
-
-    button:hover {
-        opacity: 0.9;
-    }
-
-    button.secondary {
-        background: #333;
-        color: #eee;
-    }
-
-    /* =========================
-       File info
-       ========================= */
-
-    .file-info {
-        margin-top: 15px;
-
-        padding: 12px 15px;
-
-        background: #222;
-        border: 1px solid #333;
-        border-radius: 10px;
-
-        text-align: center;
-
-        color: #aaa;
-        font-size: 13px;
-    }
-
-    @media (max-width: 700px) {
-
-        .preview-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .svg-preview {
-            min-height: 300px;
-        }
-    }
+}
 </style>
 </head>
-
 
 <body>
 
@@ -239,7 +222,7 @@
     <h1>🔄 SVG Color Inverter</h1>
 
     <p>
-        Invert the colors without changing the SVG's geometry or other properties.
+        Invert SVG colors while preserving gradients, geometry, and transparency.
     </p>
 
 </header>
@@ -247,9 +230,7 @@
 
 <div class="app">
 
-    <!-- =========================
-         Upload area
-         ========================= -->
+    <!-- Upload -->
 
     <div
         class="drop-zone"
@@ -282,9 +263,7 @@
     >
 
 
-    <!-- =========================
-         File information
-         ========================= -->
+    <!-- File information -->
 
     <div
         class="file-info"
@@ -293,9 +272,7 @@
     ></div>
 
 
-    <!-- =========================
-         Preview
-         ========================= -->
+    <!-- Preview -->
 
     <div
         class="preview-grid"
@@ -341,9 +318,7 @@
     </div>
 
 
-    <!-- =========================
-         Controls
-         ========================= -->
+    <!-- Controls -->
 
     <div
         class="controls"
@@ -369,60 +344,9 @@
 
 <script>
 
-/*
-============================================================
-SVG COLOR INVERTER
-============================================================
-
-The SVG is parsed as XML.
-
-We do NOT draw it onto a canvas.
-
-We change only actual color values.
-
-This means things such as:
-
-- paths
-- positions
-- dimensions
-- viewBox
-- transforms
-- clipping
-- masks
-- opacity
-- stroke widths
-- line widths
-- filters
-
-are not deliberately changed.
-
-Solid colors are inverted using:
-
-    R -> 255 - R
-    G -> 255 - G
-    B -> 255 - B
-
-Alpha is preserved.
-
-Example:
-
-    #ff0000
-
-becomes:
-
-    #00ffff
-
-And:
-
-    rgba(255, 0, 0, 0.5)
-
-becomes:
-
-    rgba(0, 255, 255, 0.5)
-
-============================================================
-*/
-
+/* ==========================================================
+   ELEMENTS
+   ========================================================== */
 
 const fileInput =
     document.getElementById("fileInput");
@@ -453,19 +377,17 @@ const newButton =
 
 
 let originalSVG = "";
-
 let invertedSVG = "";
 
 let originalFileName = "image.svg";
 
 let originalURL = null;
-
 let invertedURL = null;
 
 
-// ==========================================================
-// Upload handling
-// ==========================================================
+/* ==========================================================
+   UPLOAD
+   ========================================================== */
 
 dropZone.addEventListener("click", () => {
 
@@ -507,31 +429,27 @@ dropZone.addEventListener("drop", event => {
 
     dropZone.classList.remove("dragover");
 
-    const files =
-        event.dataTransfer.files;
+    if (event.dataTransfer.files.length > 0) {
 
-    if (files.length > 0) {
-
-        loadSVG(files[0]);
+        loadSVG(
+            event.dataTransfer.files[0]
+        );
 
     }
 
 });
 
 
-// ==========================================================
-// Load SVG
-// ==========================================================
+/* ==========================================================
+   LOAD SVG
+   ========================================================== */
 
 function loadSVG(file) {
-
-    /*
-     * Accept SVG files only.
-     */
 
     const isSVG =
         file.type === "image/svg+xml" ||
         file.name.toLowerCase().endsWith(".svg");
+
 
     if (!isSVG) {
 
@@ -582,32 +500,28 @@ function loadSVG(file) {
 }
 
 
-// ==========================================================
-// Invert SVG colors
-// ==========================================================
+/* ==========================================================
+   INVERT SVG
+   ========================================================== */
 
 function invertSVGColors(svgText) {
-
-    /*
-     * Parse SVG as XML.
-     */
 
     const parser =
         new DOMParser();
 
-    const document =
+
+    const svgDocument =
         parser.parseFromString(
             svgText,
             "image/svg+xml"
         );
 
 
-    /*
-     * Detect XML parser errors.
-     */
-
     const parserError =
-        document.querySelector("parsererror");
+        svgDocument.querySelector(
+            "parsererror"
+        );
+
 
     if (parserError) {
 
@@ -618,18 +532,18 @@ function invertSVGColors(svgText) {
     }
 
 
-    /*
-     * Every SVG element.
-     */
+    /* ------------------------------------------------------
+       Regular SVG elements
+       ------------------------------------------------------ */
 
     const elements =
-        document.querySelectorAll("*");
+        svgDocument.querySelectorAll("*");
 
 
     elements.forEach(element => {
 
         /*
-         * Handle fill attribute.
+         * Fill
          */
 
         if (element.hasAttribute("fill")) {
@@ -637,16 +551,25 @@ function invertSVGColors(svgText) {
             const value =
                 element.getAttribute("fill");
 
-            element.setAttribute(
-                "fill",
-                invertColorValue(value)
-            );
+            if (
+                !value
+                    .trim()
+                    .toLowerCase()
+                    .startsWith("url(")
+            ) {
+
+                element.setAttribute(
+                    "fill",
+                    invertColorValue(value)
+                );
+
+            }
 
         }
 
 
         /*
-         * Handle stroke attribute.
+         * Stroke
          */
 
         if (element.hasAttribute("stroke")) {
@@ -654,16 +577,25 @@ function invertSVGColors(svgText) {
             const value =
                 element.getAttribute("stroke");
 
-            element.setAttribute(
-                "stroke",
-                invertColorValue(value)
-            );
+            if (
+                !value
+                    .trim()
+                    .toLowerCase()
+                    .startsWith("url(")
+            ) {
+
+                element.setAttribute(
+                    "stroke",
+                    invertColorValue(value)
+                );
+
+            }
 
         }
 
 
         /*
-         * Handle inline style.
+         * Inline CSS style
          */
 
         if (element.hasAttribute("style")) {
@@ -681,23 +613,104 @@ function invertSVGColors(svgText) {
     });
 
 
-    /*
-     * Serialize XML back into SVG.
-     */
+    /* ------------------------------------------------------
+       GRADIENT STOPS
+       ------------------------------------------------------ */
+
+    const stops =
+        svgDocument.querySelectorAll("stop");
+
+
+    stops.forEach(stop => {
+
+        /*
+         * stop-color attribute
+         */
+
+        if (stop.hasAttribute("stop-color")) {
+
+            const color =
+                stop.getAttribute(
+                    "stop-color"
+                );
+
+            stop.setAttribute(
+                "stop-color",
+                invertColorValue(color)
+            );
+
+        }
+
+
+        /*
+         * stop-color inside style=""
+         */
+
+        if (stop.hasAttribute("style")) {
+
+            const style =
+                stop.getAttribute("style");
+
+            stop.setAttribute(
+                "style",
+                invertStyleColors(style)
+            );
+
+        }
+
+    });
+
+
+    /* ------------------------------------------------------
+       CSS <style> blocks
+       ------------------------------------------------------
+
+       Some SVG editors put their colors here:
+
+       <style>
+           .cls-1 {
+               fill: #ff0000;
+           }
+       </style>
+
+       We process the CSS color values without changing
+       the selectors or other CSS properties.
+    */
+
+    const styleElements =
+        svgDocument.querySelectorAll("style");
+
+
+    styleElements.forEach(styleElement => {
+
+        const css =
+            styleElement.textContent;
+
+
+        styleElement.textContent =
+            invertCSSColors(css);
+
+    });
+
+
+    /* ------------------------------------------------------
+       Serialize
+       ------------------------------------------------------ */
 
     const serializer =
         new XMLSerializer();
 
+
     return serializer.serializeToString(
-        document
+        svgDocument
     );
 
 }
 
 
-// ==========================================================
-// Invert a color attribute
-// ==========================================================
+/* ==========================================================
+   COLOR VALUE INVERSION
+   ========================================================== */
 
 function invertColorValue(value) {
 
@@ -706,13 +719,13 @@ function invertColorValue(value) {
 
 
     /*
-     * Don't touch special SVG values.
+     * Values that are not colors.
      */
 
     if (
         trimmed === "none" ||
-        trimmed === "currentColor" ||
         trimmed === "inherit" ||
+        trimmed === "currentColor" ||
         trimmed === "transparent"
     ) {
 
@@ -722,13 +735,16 @@ function invertColorValue(value) {
 
 
     /*
-     * Don't alter gradients,
-     * patterns, or URLs.
+     * url(#something) means a gradient,
+     * pattern, mask, etc.
+     *
+     * The referenced object is handled separately.
      */
 
     if (
-        trimmed.startsWith("url(") ||
-        trimmed.includes("gradient")
+        trimmed
+            .toLowerCase()
+            .startsWith("url(")
     ) {
 
         return value;
@@ -736,9 +752,7 @@ function invertColorValue(value) {
     }
 
 
-    /*
-     * Hex colors.
-     */
+    /* HEX */
 
     if (
         /^#[0-9a-fA-F]{3}$/.test(trimmed)
@@ -776,9 +790,7 @@ function invertColorValue(value) {
     }
 
 
-    /*
-     * rgb() / rgba()
-     */
+    /* RGB / RGBA */
 
     if (
         /^rgba?\(/i.test(trimmed)
@@ -789,12 +801,7 @@ function invertColorValue(value) {
     }
 
 
-    /*
-     * Named CSS colors.
-
-     * We use the browser to resolve the name,
-     * then invert the resulting RGB value.
-     */
+    /* Named CSS color */
 
     if (
         /^[a-zA-Z]+$/.test(trimmed)
@@ -803,12 +810,21 @@ function invertColorValue(value) {
         const rgb =
             namedColorToRGB(trimmed);
 
+
         if (rgb) {
 
-            return invertRGB(
-                rgb.r,
-                rgb.g,
-                rgb.b
+            const inverted =
+                invertRGB(
+                    rgb.r,
+                    rgb.g,
+                    rgb.b
+                );
+
+
+            return rgbToHex(
+                inverted.r,
+                inverted.g,
+                inverted.b
             );
 
         }
@@ -816,19 +832,14 @@ function invertColorValue(value) {
     }
 
 
-    /*
-     * If we don't understand the value,
-     * leave it completely alone.
-     */
-
     return value;
 
 }
 
 
-// ==========================================================
-// Hex inversion
-// ==========================================================
+/* ==========================================================
+   HEX
+   ========================================================== */
 
 function invertHex3(hex) {
 
@@ -880,7 +891,8 @@ function invertHex4(hex) {
             16
         );
 
-    const a =
+
+    const alpha =
         hex[4] + hex[4];
 
 
@@ -888,7 +900,7 @@ function invertHex4(hex) {
         toHex(255 - r) +
         toHex(255 - g) +
         toHex(255 - b) +
-        a;
+        alpha;
 
 }
 
@@ -943,6 +955,7 @@ function invertHex8(hex) {
             16
         );
 
+
     const alpha =
         hex.substring(7, 9);
 
@@ -956,21 +969,11 @@ function invertHex8(hex) {
 }
 
 
-// ==========================================================
-// RGB / RGBA
-// ==========================================================
+/* ==========================================================
+   RGB / RGBA
+   ========================================================== */
 
 function invertRGBFunction(value) {
-
-    /*
-     * Extract numbers.
-
-     * This handles common forms such as:
-
-         rgb(255, 0, 0)
-         rgba(255, 0, 0, 0.5)
-
-     */
 
     const match =
         value.match(
@@ -1027,10 +1030,6 @@ function invertRGBFunction(value) {
         );
 
 
-    /*
-     * Preserve the original alpha exactly.
-     */
-
     if (alpha !== undefined) {
 
         return (
@@ -1056,36 +1055,38 @@ function invertRGBFunction(value) {
 }
 
 
-// ==========================================================
-// Inline style handling
-// ==========================================================
+/* ==========================================================
+   INLINE STYLE
+   ========================================================== */
 
 function invertStyleColors(style) {
 
     /*
-     * Find color-looking values inside CSS.
-
-     * We deliberately leave everything else untouched.
+     * HEX colors
      */
 
     style =
         style.replace(
             /#[0-9a-fA-F]{3,8}\b/g,
-            match => invertColorValue(match)
-        );
-
-
-    style =
-        style.replace(
-            /rgba?\([^)]*\)/gi,
-            match => invertColorValue(match)
+            match =>
+                invertColorValue(match)
         );
 
 
     /*
-     * Named colors in style attributes are harder to
-     * distinguish from CSS property names, so we only
-     * process them when they occur as color property values.
+     * RGB / RGBA
+     */
+
+    style =
+        style.replace(
+            /rgba?\([^)]*\)/gi,
+            match =>
+                invertColorValue(match)
+        );
+
+
+    /*
+     * Named colors used by SVG color properties.
      */
 
     style =
@@ -1107,22 +1108,74 @@ function invertStyleColors(style) {
 }
 
 
-// ==========================================================
-// Named CSS colors
-// ==========================================================
+/* ==========================================================
+   CSS STYLE BLOCKS
+   ========================================================== */
 
-function namedColorToRGB(name) {
+function invertCSSColors(css) {
 
     /*
-     * Use a temporary element to let the browser resolve
-     * the CSS color name.
+     * HEX colors
      */
+
+    css =
+        css.replace(
+            /#[0-9a-fA-F]{3,8}\b/g,
+            match =>
+                invertColorValue(match)
+        );
+
+
+    /*
+     * RGB / RGBA
+     */
+
+    css =
+        css.replace(
+            /rgba?\([^)]*\)/gi,
+            match =>
+                invertColorValue(match)
+        );
+
+
+    /*
+     * Named colors.
+     *
+     * Only process them when used as a color property.
+     */
+
+    css =
+        css.replace(
+            /((?:fill|stroke|color|stop-color)\s*:\s*)([a-zA-Z]+)/gi,
+            (full, prefix, color) => {
+
+                return (
+                    prefix +
+                    invertColorValue(color)
+                );
+
+            }
+        );
+
+
+    return css;
+
+}
+
+
+/* ==========================================================
+   NAMED COLORS
+   ========================================================== */
+
+function namedColorToRGB(name) {
 
     const temp =
         document.createElement("span");
 
+
     temp.style.color =
         name;
+
 
     document.body.appendChild(temp);
 
@@ -1156,9 +1209,9 @@ function namedColorToRGB(name) {
 }
 
 
-// ==========================================================
-// RGB helpers
-// ==========================================================
+/* ==========================================================
+   RGB HELPERS
+   ========================================================== */
 
 function invertRGB(r, g, b) {
 
@@ -1185,19 +1238,20 @@ function toHex(number) {
 
     return Math.round(number)
         .toString(16)
-        .padStart(2, "0");
+        .padStart(2, "0")
+        .toUpperCase();
 
 }
 
 
-// ==========================================================
-// Preview
-// ==========================================================
+/* ==========================================================
+   PREVIEW
+   ========================================================== */
 
 function showPreviews() {
 
     /*
-     * Clean up old object URLs.
+     * Remove old URLs.
      */
 
     if (originalURL) {
@@ -1207,6 +1261,7 @@ function showPreviews() {
         );
 
     }
+
 
     if (invertedURL) {
 
@@ -1218,7 +1273,7 @@ function showPreviews() {
 
 
     /*
-     * Original SVG
+     * Original
      */
 
     const originalBlob =
@@ -1241,7 +1296,7 @@ function showPreviews() {
 
 
     /*
-     * Inverted SVG
+     * Inverted
      */
 
     const invertedBlob =
@@ -1270,6 +1325,7 @@ function showPreviews() {
     previewGrid.style.display =
         "grid";
 
+
     controls.style.display =
         "flex";
 
@@ -1285,16 +1341,18 @@ function showPreviews() {
 }
 
 
-// ==========================================================
-// Download
-// ==========================================================
+/* ==========================================================
+   DOWNLOAD
+   ========================================================== */
 
 downloadButton.addEventListener(
     "click",
     () => {
 
         if (!invertedSVG) {
+
             return;
+
         }
 
 
@@ -1302,7 +1360,8 @@ downloadButton.addEventListener(
             new Blob(
                 [invertedSVG],
                 {
-                    type: "image/svg+xml;charset=utf-8"
+                    type:
+                        "image/svg+xml;charset=utf-8"
                 }
             );
 
@@ -1323,7 +1382,10 @@ downloadButton.addEventListener(
 
         const baseName =
             originalFileName
-                .replace(/\.svg$/i, "");
+                .replace(
+                    /\.svg$/i,
+                    ""
+                );
 
 
         link.download =
@@ -1348,9 +1410,9 @@ downloadButton.addEventListener(
 );
 
 
-// ==========================================================
-// Upload another
-// ==========================================================
+/* ==========================================================
+   UPLOAD ANOTHER
+   ========================================================== */
 
 newButton.addEventListener(
     "click",
