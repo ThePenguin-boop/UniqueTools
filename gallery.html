@@ -1,195 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>Image Gallery</title>
 
+
 <style>
+
+/* ================================ 
+   GENERAL
+================================ */
+
 * {
     box-sizing: border-box;
 }
 
+
 body {
+
     margin: 0;
+
     min-height: 100vh;
 
     font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
+        Arial,
+        Helvetica,
         sans-serif;
 
-    background: #151515;
-    color: #eee;
+    background:
+        radial-gradient(
+            circle at top,
+            #202020 0%,
+            #111 45%,
+            #090909 100%
+        );
+
+    color: #f5f5f5;
 }
+
+
+.container {
+
+    width: min(1200px, 92%);
+
+    margin: 0 auto;
+
+    padding:
+        55px 0
+        70px;
+}
+
+
+/* ================================
+   HEADER
+================================ */
 
 header {
+
     text-align: center;
-    padding: 50px 20px 30px;
+
+    margin-bottom: 35px;
 }
+
 
 header h1 {
-    margin: 0;
-    font-size: 42px;
-    font-weight: 750;
+
+    margin: 0 0 10px;
+
+    font-size:
+        clamp(
+            2rem,
+            5vw,
+            3rem
+        );
+
+    font-weight: 700;
+
+    letter-spacing: -1px;
 }
+
 
 header p {
-    margin: 10px 0 0;
-    color: #999;
-    font-size: 16px;
+
+    margin: 0;
+
+    color: #a9a9a9;
+
+    font-size: 1rem;
 }
 
 
-/* =========================
-   CONTROLS
-   ========================= */
+/* ================================
+   MAIN PANEL
+================================ */
 
-.controls {
-    width: min(1100px, calc(100% - 30px));
+.panel {
 
-    margin: 0 auto 25px;
+    background:
+        rgba(
+            25,
+            25,
+            25,
+            0.92
+        );
+
+    border:
+        1px solid #333;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    box-shadow:
+
+        0 15px 45px
+        rgba(
+            0,
+            0,
+            0,
+            0.35
+        ),
+
+        inset 0 1px 0
+        rgba(
+            255,
+            255,
+            255,
+            0.03
+        );
+}
+
+
+/* ================================
+   TOOLBAR
+================================ */
+
+.toolbar {
 
     display: flex;
-    justify-content: space-between;
+
+    justify-content:
+        space-between;
+
     align-items: center;
 
-    gap: 15px;
+    margin-bottom: 22px;
 }
 
-.status {
+
+.gallery-title {
+
+    margin: 0;
+
+    font-size: 1.15rem;
+}
+
+
+.gallery-count {
+
     color: #888;
-    font-size: 14px;
-}
 
-.refresh-button {
-    border: 1px solid #444;
-    border-radius: 8px;
+    font-size: 0.9rem;
 
-    padding: 9px 14px;
-
-    background: #222;
-    color: #eee;
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition:
-        background 0.15s,
-        border-color 0.15s;
-}
-
-.refresh-button:hover {
-    background: #292929;
-    border-color: #666;
+    margin-left: 6px;
 }
 
 
-/* =========================
+/* ================================
    GALLERY
-   ========================= */
+================================ */
 
 .gallery {
-    width: min(1100px, calc(100% - 30px));
-
-    margin: 0 auto 50px;
 
     display: grid;
 
     grid-template-columns:
         repeat(
             auto-fill,
-            minmax(250px, 1fr)
+            minmax(240px, 1fr)
         );
 
     gap: 20px;
 }
 
 
-/* =========================
-   IMAGE CARD
-   ========================= */
+/* ================================
+   CARD
+================================ */
 
-.image-card {
+.card {
+
     overflow: hidden;
 
-    background: #222;
+    background: #191919;
 
-    border: 1px solid #333;
+    border:
+        1px solid #333;
 
-    border-radius: 16px;
+    border-radius: 15px;
+
+    box-shadow:
+        0 10px 25px
+        rgba(
+            0,
+            0,
+            0,
+            0.22
+        );
 
     transition:
-        transform 0.15s,
-        background 0.15s,
-        border-color 0.15s;
-}
-
-.image-card:hover {
-    transform: translateY(-4px);
-
-    background: #292929;
-
-    border-color: #555;
+        transform 0.2s ease,
+        border-color 0.2s ease;
 }
 
 
-/* =========================
+.card:hover {
+
+    transform:
+        translateY(-3px);
+
+    border-color:
+        #4a4a4a;
+}
+
+
+/* ================================
    IMAGE PREVIEW
-   ========================= */
+================================ */
 
-.image-preview {
-    width: 100%;
-    height: 220px;
+.preview {
+
+    position: relative;
+
+    height: 210px;
 
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
-    padding: 15px;
+    padding: 12px;
 
-    background-color: #888;
+    background:
 
-    background-image:
         linear-gradient(
             45deg,
-            #aaa 25%,
+            #1c1c1c 25%,
             transparent 25%
         ),
+
         linear-gradient(
             -45deg,
-            #aaa 25%,
+            #1c1c1c 25%,
             transparent 25%
         ),
+
         linear-gradient(
             45deg,
             transparent 75%,
-            #aaa 75%
+            #1c1c1c 75%
         ),
+
         linear-gradient(
             -45deg,
             transparent 75%,
-            #aaa 75%
+            #1c1c1c 75%
         );
 
-    background-size: 30px 30px;
+    background-size:
+        24px 24px;
 
     background-position:
         0 0,
-        0 15px,
-        15px -15px,
-        -15px 0;
+        0 12px,
+        12px -12px,
+        -12px 0;
 }
 
-.image-preview img {
+
+.preview img {
+
     max-width: 100%;
+
     max-height: 100%;
 
     object-fit: contain;
@@ -198,761 +299,406 @@ header p {
 }
 
 
-/* =========================
-   IMAGE INFO
-   ========================= */
+/* ================================
+   FILE TYPE BADGE
+================================ */
 
-.image-info {
-    padding: 16px;
+.file-type {
+
+    position: absolute;
+
+    top: 10px;
+    left: 10px;
+
+    padding:
+        5px 8px;
+
+    border-radius: 7px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            0.75
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.12
+        );
+
+    font-size: 0.72rem;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+
+    z-index: 2;
 }
 
-.image-name {
-    margin: 0 0 5px;
 
-    font-size: 16px;
-    font-weight: 650;
+/* ================================
+   CARD INFORMATION
+================================ */
 
-    word-break: break-word;
-}
+.card-info {
 
-.image-type {
-    margin: 0 0 14px;
-
-    color: #888;
-
-    font-size: 13px;
+    padding: 15px;
 }
 
 
-/* =========================
+.file-name {
+
+    font-size: 0.95rem;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    margin-bottom: 6px;
+}
+
+
+.file-details {
+
+    color: #777;
+
+    font-size: 0.78rem;
+
+    margin-bottom: 14px;
+}
+
+
+/* ================================
    DOWNLOAD BUTTON
-   ========================= */
+================================ */
 
-.download-button {
+.download {
+
     display: block;
 
     width: 100%;
 
     padding: 10px;
 
-    border-radius: 8px;
-
-    background: #eee;
-    color: #111;
-
     text-align: center;
-    text-decoration: none;
-
-    font-size: 14px;
-    font-weight: 650;
-
-    transition:
-        background 0.15s;
-}
-
-.download-button:hover {
-    background: #fff;
-}
-
-
-/* =========================
-   MESSAGE
-   ========================= */
-
-.message {
-    grid-column: 1 / -1;
-
-    padding: 50px 20px;
-
-    border-radius: 16px;
-
-    background: #222;
-
-    border: 1px solid #333;
-
-    text-align: center;
-
-    color: #888;
-}
-
-.message strong {
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: #eee;
-
-    font-size: 18px;
-}
-
-
-/* =========================
-   BACK BUTTON
-   ========================= */
-
-.back-button {
-    display: block;
-
-    width: fit-content;
-
-    margin: 0 auto 50px;
-
-    padding: 10px 15px;
-
-    border-radius: 8px;
-
-    background: #222;
-
-    border: 1px solid #333;
-
-    color: #eee;
 
     text-decoration: none;
 
-    font-weight: 600;
+    color: #fff;
+
+    background: #252525;
+
+    border:
+        1px solid #444;
+
+    border-radius: 9px;
+
+    font-size: 0.85rem;
 
     transition:
-        background 0.15s,
-        border-color 0.15s;
-}
-
-.back-button:hover {
-    background: #292929;
-
-    border-color: #555;
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
 
 
-/* =========================
-   FOOTER
-   ========================= */
+.download:hover {
 
-footer {
-    text-align: center;
+    background: #333;
 
-    color: #666;
+    border-color: #666;
 
-    font-size: 13px;
-
-    padding-bottom: 30px;
+    transform:
+        translateY(-1px);
 }
 
 
-/* =========================
+/* ================================
+   INFORMATION BOX
+================================ */
+
+.info {
+
+    margin-top: 25px;
+
+    padding:
+        14px 16px;
+
+    border-radius: 10px;
+
+    border:
+        1px solid #2d2d2d;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.025
+        );
+
+    color: #777;
+
+    font-size: 0.8rem;
+
+    line-height: 1.5;
+}
+
+
+/* ================================
    MOBILE
-   ========================= */
+================================ */
 
 @media (max-width: 600px) {
 
-    header h1 {
-        font-size: 34px;
+    .container {
+
+        width: 94%;
+
+        padding-top: 30px;
     }
 
-    .controls {
-        align-items: stretch;
-        flex-direction: column;
+
+    .panel {
+
+        padding: 16px;
     }
 
-    .refresh-button {
-        width: 100%;
-    }
 
     .gallery {
+
         grid-template-columns: 1fr;
     }
 
 }
+
 </style>
+
 </head>
 
 
 <body>
 
 
+<div class="container">
+
+
 <header>
 
-    <h1>📷 Image Gallery</h1>
+    <h1>
+        Image Gallery
+    </h1>
 
     <p>
-        Images from the UniqueTools images folder
+        Browse and download the available images.
     </p>
 
 </header>
 
 
-<div class="controls">
-
-    <div
-        class="status"
-        id="status"
-    >
-        Finding images...
-    </div>
+<div class="panel">
 
 
-    <button
-        class="refresh-button"
-        id="refreshButton"
-        type="button"
-    >
-        ↻ Refresh
-    </button>
+<div class="toolbar">
+
+    <h2 class="gallery-title">
+
+        Gallery
+
+        <span
+            class="gallery-count"
+            id="galleryCount"
+        >
+            0 files
+        </span>
+
+    </h2>
 
 </div>
 
 
-<main
+<div
     class="gallery"
     id="gallery"
-></main>
+></div>
 
 
-<a
-    href="index.html"
-    class="back-button"
->
-    ← Back to My Tools
-</a>
+<div class="info">
+
+    Images are stored in the
+    <strong>images</strong> folder.
+    Add a filename to the list in the code
+    to make it appear in the gallery.
+
+</div>
 
 
-<footer>
-    My personal image gallery
-</footer>
+</div>
+
+
+</div>
+
 
 
 <script>
 
-/*
-============================================================
-AUTOMATIC GITHUB GALLERY
-============================================================
 
-Repository:
+/* ==================================================
+   
+   ⭐ ADD YOUR FILES HERE ⭐
 
-    ThePenguin-boop/UniqueTools
+   Put the actual files inside the "images"
+   folder, then add their filenames below.
 
-Images folder:
+   That's all you need to do.
 
-    images/
-
-This version does NOT use:
-
-    ❌ GitHub API
-    ❌ images.json
-    ❌ GitHub Actions
-    ❌ API tokens
-
-It uses jsDelivr's public GitHub file listing instead.
-
-Simply upload an image to:
-
-    images/
-
-and it will automatically appear.
-
-============================================================
-*/
+================================================== */
 
 
-const OWNER =
-    "ThePenguin-boop";
+const images = [
+
+    "solvers.svg",
+
+    "Template AVA OC.svg",
+
+    "MD Weapons.svg",
+
+    "Ashton1978 Base MD Vectors.svg",
+
+    // Add more files below:
+
+    // "my-image.svg",
+    // "another-image.png",
+    // "cool-picture.jpg",
+    // "logo.webp",
+
+];
 
 
-const REPOSITORY =
-    "UniqueTools";
+
+/* ==================================================
+   SETTINGS
+================================================== */
+
+const imageFolder = "images/";
 
 
-const BRANCH =
-    "main";
 
-
-const IMAGE_FOLDER =
-    "images";
-
-
-/*
- * jsDelivr directory API.
- *
- * This returns a list of files in the
- * GitHub repository.
- */
-
-const DIRECTORY_URL =
-    "https://data.jsdelivr.com/v1/package/gh/" +
-    OWNER +
-    "/" +
-    REPOSITORY +
-    "@" +
-    BRANCH +
-    "/flat";
-
-
-/*
- * Base URL for the actual images.
- */
-
-const IMAGE_BASE_URL =
-    "https://cdn.jsdelivr.net/gh/" +
-    OWNER +
-    "/" +
-    REPOSITORY +
-    "@" +
-    BRANCH +
-    "/";
-
-
-/*
-============================================================
-ELEMENTS
-============================================================
-*/
+/* ==================================================
+   CREATE GALLERY
+================================================== */
 
 const gallery =
     document.getElementById("gallery");
 
 
-const status =
-    document.getElementById("status");
+const galleryCount =
+    document.getElementById("galleryCount");
 
 
-const refreshButton =
-    document.getElementById("refreshButton");
+galleryCount.textContent =
+    images.length === 1
+        ? "1 file"
+        : `${images.length} files`;
 
 
-/*
-============================================================
-SUPPORTED IMAGE TYPES
-============================================================
-*/
 
-const supportedExtensions = [
+/* ==================================================
+   CREATE EACH CARD
+================================================== */
 
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".gif",
-    ".webp",
-    ".svg",
-    ".bmp",
-    ".avif"
+images.forEach(filename => {
 
-];
+    createCard(filename);
 
+});
 
-/*
-============================================================
-LOAD GALLERY
-============================================================
-*/
 
-async function loadGallery() {
 
-    gallery.innerHTML = "";
+function createCard(filename) {
 
-    status.textContent =
-        "Finding images...";
+    const extension =
+        getExtension(filename);
 
 
-    try {
+    const fileType =
+        getFileType(extension);
 
-        /*
-         * Add a timestamp to reduce
-         * browser caching.
-         */
 
-        const response =
-            await fetch(
-                DIRECTORY_URL +
-                "?t=" +
-                Date.now(),
-                {
-                    cache: "no-store"
-                }
-            );
+    const fileURL =
+        imageFolder +
+        encodeURIComponent(filename);
 
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Could not access the image list."
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        /*
-         * jsDelivr returns an object
-         * containing the file list.
-         */
-
-        if (
-            !data ||
-            !Array.isArray(data.files)
-        ) {
-
-            throw new Error(
-                "The image list was not formatted correctly."
-            );
-
-        }
-
-
-        /*
-         * Find files inside:
-
-             images/
-
-         */
-
-        const imageFiles =
-            data.files.filter(file => {
-
-                const filename =
-                    file.name;
-
-
-                if (
-                    !filename.startsWith(
-                        IMAGE_FOLDER + "/"
-                    )
-                ) {
-
-                    return false;
-
-                }
-
-
-                /*
-                 * Don't include files inside
-                 * subdirectories.
-                 */
-
-                const remaining =
-                    filename.substring(
-                        IMAGE_FOLDER.length + 1
-                    );
-
-
-                if (
-                    remaining.includes("/")
-                ) {
-
-                    return false;
-
-                }
-
-
-                /*
-                 * Check extension.
-                 */
-
-                const lower =
-                    filename.toLowerCase();
-
-
-                return supportedExtensions.some(
-                    extension =>
-                        lower.endsWith(extension)
-                );
-
-            });
-
-
-        /*
-         * Sort alphabetically.
-         */
-
-        imageFiles.sort(
-            (a, b) =>
-                a.name.localeCompare(
-                    b.name,
-                    undefined,
-                    {
-                        numeric: true,
-                        sensitivity: "base"
-                    }
-                )
-        );
-
-
-        /*
-         * No images.
-         */
-
-        if (imageFiles.length === 0) {
-
-            status.textContent =
-                "No images found.";
-
-
-            gallery.innerHTML = `
-
-                <div class="message">
-
-                    <strong>
-                        📭 No images found
-                    </strong>
-
-                    Upload an image to:
-
-                    <br><br>
-
-                    <b>
-                        UniqueTools / images
-                    </b>
-
-                </div>
-
-            `;
-
-            return;
-
-        }
-
-
-        /*
-         * Create cards.
-         */
-
-        imageFiles.forEach(
-            createImageCard
-        );
-
-
-        /*
-         * Show count.
-         */
-
-        status.textContent =
-            imageFiles.length +
-            (
-                imageFiles.length === 1
-                    ? " image"
-                    : " images"
-            ) +
-            " found";
-
-
-    }
-    catch (error) {
-
-        console.error(
-            "Gallery error:",
-            error
-        );
-
-
-        status.textContent =
-            "Gallery error";
-
-
-        gallery.innerHTML = `
-
-            <div class="message">
-
-                <strong>
-                    ⚠️ Could not load images
-                </strong>
-
-                ${escapeHTML(error.message)}
-
-                <br><br>
-
-                <small>
-                    Make sure the repository is public
-                    and the images folder contains
-                    image files.
-                </small>
-
-            </div>
-
-        `;
-
-    }
-
-}
-
-
-/*
-============================================================
-CREATE IMAGE CARD
-============================================================
-*/
-
-function createImageCard(file) {
 
     const card =
-        document.createElement("article");
+        document.createElement("div");
 
 
     card.className =
-        "image-card";
+        "card";
 
 
-    /*
-     * jsDelivr file path.
+    card.innerHTML = `
 
-     * Example:
+        <div class="preview">
 
-       images/cat.png
+            <span class="file-type">
+                ${fileType}
+            </span>
 
-     */
+            <img
+                src="${fileURL}"
+                alt="${escapeHTML(filename)}"
+                loading="lazy"
+            >
 
-    const imageURL =
-        IMAGE_BASE_URL +
-        file.name
-            .split("/")
-            .map(
-                part =>
-                    encodeURIComponent(part)
-            )
-            .join("/");
+        </div>
 
 
-    /*
-     * Preview area.
-     */
+        <div class="card-info">
 
-    const preview =
-        document.createElement("div");
+            <div
+                class="file-name"
+                title="${escapeHTML(filename)}"
+            >
+                ${escapeHTML(filename)}
+            </div>
 
 
-    preview.className =
-        "image-preview";
+            <div class="file-details">
 
+                ${fileType}
 
-    const image =
-        document.createElement("img");
+                ·
 
+                ${extension.toUpperCase()}
 
-    image.src =
-        imageURL;
+            </div>
 
 
-    image.alt =
-        file.name
-            .split("/")
-            .pop();
+            <a
+                class="download"
+                href="${fileURL}"
+                download="${escapeHTML(filename)}"
+            >
+                Download
+            </a>
 
+        </div>
 
-    image.loading =
-        "lazy";
-
-
-    /*
-     * If an image fails to load,
-     * display a useful message.
-     */
-
-    image.addEventListener(
-        "error",
-        () => {
-
-            image.alt =
-                "Unable to load image";
-
-        }
-    );
-
-
-    preview.appendChild(image);
-
-
-    /*
-     * Information area.
-     */
-
-    const info =
-        document.createElement("div");
-
-
-    info.className =
-        "image-info";
-
-
-    const filename =
-        file.name
-            .split("/")
-            .pop();
-
-
-    const name =
-        document.createElement("p");
-
-
-    name.className =
-        "image-name";
-
-
-    name.textContent =
-        filename;
-
-
-    /*
-     * File type.
-     */
-
-    const extension =
-        filename
-            .split(".")
-            .pop()
-            .toUpperCase();
-
-
-    const type =
-        document.createElement("p");
-
-
-    type.className =
-        "image-type";
-
-
-    type.textContent =
-        extension;
-
-
-    /*
-     * Download link.
-     */
-
-    const download =
-        document.createElement("a");
-
-
-    download.className =
-        "download-button";
-
-
-    download.href =
-        imageURL;
-
-
-    download.target =
-        "_blank";
-
-
-    download.rel =
-        "noopener";
-
-
-    download.textContent =
-        "Download";
-
-
-    info.appendChild(name);
-
-    info.appendChild(type);
-
-    info.appendChild(download);
-
-
-    card.appendChild(preview);
-
-    card.appendChild(info);
+    `;
 
 
     gallery.appendChild(card);
@@ -960,11 +706,77 @@ function createImageCard(file) {
 }
 
 
-/*
-============================================================
-ESCAPE HTML
-============================================================
-*/
+
+/* ==================================================
+   GET FILE EXTENSION
+================================================== */
+
+function getExtension(filename) {
+
+    const parts =
+        filename.split(".");
+
+
+    if (parts.length < 2) {
+
+        return "file";
+
+    }
+
+
+    return parts
+        .pop()
+        .toLowerCase();
+
+}
+
+
+
+/* ==================================================
+   FRIENDLY FILE TYPE
+================================================== */
+
+function getFileType(extension) {
+
+    const types = {
+
+        svg: "SVG",
+
+        png: "PNG",
+
+        jpg: "JPG",
+
+        jpeg: "JPEG",
+
+        gif: "GIF",
+
+        webp: "WEBP",
+
+        avif: "AVIF",
+
+        bmp: "BMP",
+
+        ico: "ICO",
+
+        tif: "TIFF",
+
+        tiff: "TIFF"
+
+    };
+
+
+    return (
+        types[extension] ||
+        extension.toUpperCase()
+    );
+
+}
+
+
+
+/* ==================================================
+   SECURITY
+================================================== */
 
 function escapeHTML(text) {
 
@@ -997,28 +809,9 @@ function escapeHTML(text) {
 
 }
 
-
-/*
-============================================================
-REFRESH
-============================================================
-*/
-
-refreshButton.addEventListener(
-    "click",
-    loadGallery
-);
-
-
-/*
-============================================================
-START
-============================================================
-*/
-
-loadGallery();
-
 </script>
 
+
 </body>
+
 </html>
