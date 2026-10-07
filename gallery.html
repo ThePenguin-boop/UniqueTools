@@ -199,7 +199,7 @@ header p {
 
 
 /* =========================
-   INFO
+   IMAGE INFO
    ========================= */
 
 .image-info {
@@ -225,7 +225,7 @@ header p {
 
 
 /* =========================
-   DOWNLOAD
+   DOWNLOAD BUTTON
    ========================= */
 
 .download-button {
@@ -350,7 +350,6 @@ footer {
 
     .controls {
         align-items: stretch;
-
         flex-direction: column;
     }
 
@@ -387,7 +386,7 @@ footer {
         class="status"
         id="status"
     >
-        Loading images...
+        Finding images...
     </div>
 
 
@@ -425,28 +424,88 @@ footer {
 
 /*
 ============================================================
-AUTOMATIC IMAGE GALLERY
+AUTOMATIC GITHUB GALLERY
 ============================================================
 
-This gallery does NOT use the GitHub API.
+Repository:
 
-Instead, GitHub Actions creates:
+    ThePenguin-boop/UniqueTools
 
-    images.json
+Images folder:
 
-whenever the repository changes.
+    images/
 
-The gallery reads that local file.
+This version does NOT use:
 
-This means visitors will NOT use GitHub's API
-and there is no API rate limit problem.
+    ❌ GitHub API
+    ❌ images.json
+    ❌ GitHub Actions
+    ❌ API tokens
+
+It uses jsDelivr's public GitHub file listing instead.
+
+Simply upload an image to:
+
+    images/
+
+and it will automatically appear.
 
 ============================================================
 */
 
 
-const IMAGE_FOLDER = "images";
+const OWNER =
+    "ThePenguin-boop";
 
+
+const REPOSITORY =
+    "UniqueTools";
+
+
+const BRANCH =
+    "main";
+
+
+const IMAGE_FOLDER =
+    "images";
+
+
+/*
+ * jsDelivr directory API.
+ *
+ * This returns a list of files in the
+ * GitHub repository.
+ */
+
+const DIRECTORY_URL =
+    "https://data.jsdelivr.com/v1/package/gh/" +
+    OWNER +
+    "/" +
+    REPOSITORY +
+    "@" +
+    BRANCH +
+    "/flat";
+
+
+/*
+ * Base URL for the actual images.
+ */
+
+const IMAGE_BASE_URL =
+    "https://cdn.jsdelivr.net/gh/" +
+    OWNER +
+    "/" +
+    REPOSITORY +
+    "@" +
+    BRANCH +
+    "/";
+
+
+/*
+============================================================
+ELEMENTS
+============================================================
+*/
 
 const gallery =
     document.getElementById("gallery");
@@ -462,28 +521,49 @@ const refreshButton =
 
 /*
 ============================================================
-LOAD IMAGES
+SUPPORTED IMAGE TYPES
 ============================================================
 */
 
-async function loadImages() {
+const supportedExtensions = [
+
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".svg",
+    ".bmp",
+    ".avif"
+
+];
+
+
+/*
+============================================================
+LOAD GALLERY
+============================================================
+*/
+
+async function loadGallery() {
 
     gallery.innerHTML = "";
 
     status.textContent =
-        "Loading images...";
+        "Finding images...";
 
 
     try {
 
         /*
-         * Add a timestamp so the browser doesn't
-         * keep an old images.json in its cache.
+         * Add a timestamp to reduce
+         * browser caching.
          */
 
         const response =
             await fetch(
-                "images.json?time=" +
+                DIRECTORY_URL +
+                "?t=" +
                 Date.now(),
                 {
                     cache: "no-store"
@@ -494,33 +574,120 @@ async function loadImages() {
         if (!response.ok) {
 
             throw new Error(
-                "images.json could not be loaded."
+                "Could not access the image list."
             );
 
         }
 
 
-        const images =
+        const data =
             await response.json();
 
 
-        if (!Array.isArray(images)) {
+        /*
+         * jsDelivr returns an object
+         * containing the file list.
+         */
+
+        if (
+            !data ||
+            !Array.isArray(data.files)
+        ) {
 
             throw new Error(
-                "images.json is not formatted correctly."
+                "The image list was not formatted correctly."
             );
 
         }
 
 
         /*
+         * Find files inside:
+
+             images/
+
+         */
+
+        const imageFiles =
+            data.files.filter(file => {
+
+                const filename =
+                    file.name;
+
+
+                if (
+                    !filename.startsWith(
+                        IMAGE_FOLDER + "/"
+                    )
+                ) {
+
+                    return false;
+
+                }
+
+
+                /*
+                 * Don't include files inside
+                 * subdirectories.
+                 */
+
+                const remaining =
+                    filename.substring(
+                        IMAGE_FOLDER.length + 1
+                    );
+
+
+                if (
+                    remaining.includes("/")
+                ) {
+
+                    return false;
+
+                }
+
+
+                /*
+                 * Check extension.
+                 */
+
+                const lower =
+                    filename.toLowerCase();
+
+
+                return supportedExtensions.some(
+                    extension =>
+                        lower.endsWith(extension)
+                );
+
+            });
+
+
+        /*
+         * Sort alphabetically.
+         */
+
+        imageFiles.sort(
+            (a, b) =>
+                a.name.localeCompare(
+                    b.name,
+                    undefined,
+                    {
+                        numeric: true,
+                        sensitivity: "base"
+                    }
+                )
+        );
+
+
+        /*
          * No images.
          */
 
-        if (images.length === 0) {
+        if (imageFiles.length === 0) {
 
             status.textContent =
                 "No images found.";
+
 
             gallery.innerHTML = `
 
@@ -530,8 +697,13 @@ async function loadImages() {
                         📭 No images found
                     </strong>
 
-                    Upload an image to the
-                    <b>images</b> folder.
+                    Upload an image to:
+
+                    <br><br>
+
+                    <b>
+                        UniqueTools / images
+                    </b>
 
                 </div>
 
@@ -543,35 +715,22 @@ async function loadImages() {
 
 
         /*
-         * Sort alphabetically.
-         */
-
-        images.sort(
-            (a, b) =>
-                a.localeCompare(
-                    b,
-                    undefined,
-                    {
-                        numeric: true,
-                        sensitivity: "base"
-                    }
-                )
-        );
-
-
-        /*
          * Create cards.
          */
 
-        images.forEach(
+        imageFiles.forEach(
             createImageCard
         );
 
 
+        /*
+         * Show count.
+         */
+
         status.textContent =
-            images.length +
+            imageFiles.length +
             (
-                images.length === 1
+                imageFiles.length === 1
                     ? " image"
                     : " images"
             ) +
@@ -604,8 +763,9 @@ async function loadImages() {
                 <br><br>
 
                 <small>
-                    Make sure the GitHub Actions workflow
-                    has run at least once.
+                    Make sure the repository is public
+                    and the images folder contains
+                    image files.
                 </small>
 
             </div>
@@ -623,7 +783,7 @@ CREATE IMAGE CARD
 ============================================================
 */
 
-function createImageCard(filename) {
+function createImageCard(file) {
 
     const card =
         document.createElement("article");
@@ -634,21 +794,27 @@ function createImageCard(filename) {
 
 
     /*
-     * Image URL.
-     *
-     * Because gallery.html and images/
-     * are on the same GitHub Pages site,
-     * this is a normal relative URL.
+     * jsDelivr file path.
+
+     * Example:
+
+       images/cat.png
+
      */
 
     const imageURL =
-        IMAGE_FOLDER +
-        "/" +
-        encodeURIComponent(filename);
+        IMAGE_BASE_URL +
+        file.name
+            .split("/")
+            .map(
+                part =>
+                    encodeURIComponent(part)
+            )
+            .join("/");
 
 
     /*
-     * Preview.
+     * Preview area.
      */
 
     const preview =
@@ -668,18 +834,36 @@ function createImageCard(filename) {
 
 
     image.alt =
-        filename;
+        file.name
+            .split("/")
+            .pop();
 
 
     image.loading =
         "lazy";
 
 
+    /*
+     * If an image fails to load,
+     * display a useful message.
+     */
+
+    image.addEventListener(
+        "error",
+        () => {
+
+            image.alt =
+                "Unable to load image";
+
+        }
+    );
+
+
     preview.appendChild(image);
 
 
     /*
-     * Information.
+     * Information area.
      */
 
     const info =
@@ -688,6 +872,12 @@ function createImageCard(filename) {
 
     info.className =
         "image-info";
+
+
+    const filename =
+        file.name
+            .split("/")
+            .pop();
 
 
     const name =
@@ -701,6 +891,10 @@ function createImageCard(filename) {
     name.textContent =
         filename;
 
+
+    /*
+     * File type.
+     */
 
     const extension =
         filename
@@ -722,7 +916,7 @@ function createImageCard(filename) {
 
 
     /*
-     * Download button.
+     * Download link.
      */
 
     const download =
@@ -737,8 +931,12 @@ function createImageCard(filename) {
         imageURL;
 
 
-    download.download =
-        filename;
+    download.target =
+        "_blank";
+
+
+    download.rel =
+        "noopener";
 
 
     download.textContent =
@@ -802,13 +1000,13 @@ function escapeHTML(text) {
 
 /*
 ============================================================
-REFRESH BUTTON
+REFRESH
 ============================================================
 */
 
 refreshButton.addEventListener(
     "click",
-    loadImages
+    loadGallery
 );
 
 
@@ -818,7 +1016,7 @@ START
 ============================================================
 */
 
-loadImages();
+loadGallery();
 
 </script>
 
