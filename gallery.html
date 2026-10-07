@@ -14,9 +14,9 @@
 body {
     margin: 0;
     min-height: 100vh;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: #151515;
     color: #eee;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 header {
@@ -36,20 +36,57 @@ header p {
     font-size: 16px;
 }
 
+.controls {
+    width: min(1100px, calc(100% - 30px));
+    margin: 0 auto 25px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.status {
+    color: #888;
+    font-size: 14px;
+}
+
+.refresh-button {
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 9px 14px;
+
+    background: #222;
+    color: #eee;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.refresh-button:hover {
+    background: #292929;
+    border-color: #666;
+}
+
 .gallery {
     width: min(1100px, calc(100% - 30px));
-    margin: 0 auto 40px;
+    margin: 0 auto 50px;
 
     display: grid;
-    grid-template-columns:
-        repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(250px, 1fr)
+    );
 
     gap: 20px;
 }
-
-/* =========================
-   Image cards
-   ========================= */
 
 .image-card {
     overflow: hidden;
@@ -151,34 +188,29 @@ header p {
     background: #fff;
 }
 
-/* =========================
-   Status
-   ========================= */
+.message {
+    grid-column: 1 / -1;
 
-.status {
-    width: min(1100px, calc(100% - 30px));
+    padding: 50px 20px;
 
-    margin: 0 auto 30px;
-
-    padding: 18px;
-
-    border-radius: 12px;
+    border-radius: 16px;
 
     background: #222;
     border: 1px solid #333;
 
     text-align: center;
 
-    color: #999;
+    color: #888;
 }
 
-.error {
-    color: #ff9999;
-}
+.message strong {
+    display: block;
 
-/* =========================
-   Back button
-   ========================= */
+    margin-bottom: 8px;
+
+    color: #eee;
+    font-size: 18px;
+}
 
 .back-button {
     display: block;
@@ -219,20 +251,24 @@ footer {
     padding-bottom: 30px;
 }
 
-/* =========================
-   Mobile
-   ========================= */
-
 @media (max-width: 600px) {
 
     header h1 {
         font-size: 34px;
     }
 
+    .controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .refresh-button {
+        width: 100%;
+    }
+
     .gallery {
         grid-template-columns: 1fr;
     }
-
 }
 </style>
 </head>
@@ -244,17 +280,29 @@ footer {
     <h1>📷 Image Gallery</h1>
 
     <p>
-        Images from the gallery folder
+        Images from the UniqueTools images folder
     </p>
 
 </header>
 
 
-<div
-    class="status"
-    id="status"
->
-    Loading images...
+<div class="controls">
+
+    <div
+        class="status"
+        id="status"
+    >
+        Loading images...
+    </div>
+
+    <button
+        class="refresh-button"
+        id="refreshButton"
+        type="button"
+    >
+        ↻ Refresh
+    </button>
+
 </div>
 
 
@@ -281,63 +329,51 @@ footer {
 
 /*
 ============================================================
-GITHUB IMAGE GALLERY
+AUTOMATIC GITHUB IMAGE GALLERY
 ============================================================
 
-This gallery automatically looks inside:
+Repository:
+https://github.com/ThePenguin-boop/UniqueTools
 
-    images/
+The gallery automatically checks:
 
-on your GitHub repository.
+    UniqueTools/images/
 
-You do NOT need to manually list image filenames.
+You do not need to manually enter image filenames.
 
-When you upload a new image to the images folder,
-refresh this page and it should appear automatically.
+Supported:
+    PNG
+    JPG
+    JPEG
+    GIF
+    WEBP
+    SVG
+    BMP
+    AVIF
+
+Just upload an image to the images folder,
+commit it to GitHub, then refresh this page.
 
 ============================================================
 */
 
 
 /* ==========================================================
-   SETTINGS
-   ==========================================================
-
-   Change these if necessary.
-
-   Example:
-
-   GitHub URL:
-   https://github.com/John123/my-tools
-
-   OWNER:
-   John123
-
-   REPOSITORY:
-   my-tools
-
-========================================================== */
-
-const GITHUB_OWNER = "YOUR-GITHUB-USERNAME";
-
-const GITHUB_REPOSITORY = "YOUR-REPOSITORY-NAME";
-
-const IMAGE_FOLDER = "images";
-
-
-/* ==========================================================
-   ELEMENTS
+   GITHUB SETTINGS
    ========================================================== */
 
-const gallery =
-    document.getElementById("gallery");
+const GITHUB_OWNER =
+    "ThePenguin-boop";
 
-const status =
-    document.getElementById("status");
+const GITHUB_REPOSITORY =
+    "UniqueTools";
+
+const IMAGE_FOLDER =
+    "images";
 
 
 /* ==========================================================
-   SUPPORTED IMAGE TYPES
+   SUPPORTED FILE TYPES
    ========================================================== */
 
 const supportedExtensions = [
@@ -355,19 +391,36 @@ const supportedExtensions = [
 
 
 /* ==========================================================
-   LOAD GITHUB FOLDER
+   PAGE ELEMENTS
+   ========================================================== */
+
+const gallery =
+    document.getElementById("gallery");
+
+const status =
+    document.getElementById("status");
+
+const refreshButton =
+    document.getElementById("refreshButton");
+
+
+/* ==========================================================
+   LOAD IMAGES
    ========================================================== */
 
 async function loadImages() {
 
+    gallery.innerHTML = "";
+
+    status.textContent =
+        "Loading images...";
+
+
     try {
 
-        status.textContent =
-            "Loading images...";
-
-
         /*
-         * GitHub's public contents API.
+         * Ask GitHub for everything inside
+         * the images folder.
          */
 
         const apiURL =
@@ -380,19 +433,52 @@ async function loadImages() {
 
 
         const response =
-            await fetch(apiURL);
+            await fetch(
+                apiURL,
+                {
+                    headers: {
+                        "Accept":
+                            "application/vnd.github+json",
+
+                        "X-GitHub-Api-Version":
+                            "2022-11-28"
+                    },
+
+                    cache: "no-store"
+                }
+            );
 
 
         /*
-         * Check for errors.
+         * GitHub returned an error.
          */
 
         if (!response.ok) {
 
-            throw new Error(
-                "GitHub returned " +
-                response.status
-            );
+            let errorMessage =
+                "GitHub returned HTTP " +
+                response.status;
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                if (errorData.message) {
+
+                    errorMessage =
+                        errorData.message;
+
+                }
+
+            }
+            catch {
+
+                // Keep the original error message.
+
+            }
+
+            throw new Error(errorMessage);
 
         }
 
@@ -402,7 +488,7 @@ async function loadImages() {
 
 
         /*
-         * Make sure GitHub returned a folder.
+         * Make sure the response is a folder listing.
          */
 
         if (!Array.isArray(files)) {
@@ -415,22 +501,25 @@ async function loadImages() {
 
 
         /*
-         * Keep only image files.
+         * Only keep actual image files.
          */
 
         const imageFiles =
             files.filter(file => {
 
                 if (file.type !== "file") {
+
                     return false;
+
                 }
 
-                const name =
+                const filename =
                     file.name.toLowerCase();
+
 
                 return supportedExtensions.some(
                     extension =>
-                        name.endsWith(extension)
+                        filename.endsWith(extension)
                 );
 
             });
@@ -443,19 +532,40 @@ async function loadImages() {
         imageFiles.sort(
             (a, b) =>
                 a.name.localeCompare(
-                    b.name
+                    b.name,
+                    undefined,
+                    {
+                        numeric: true,
+                        sensitivity: "base"
+                    }
                 )
         );
 
 
         /*
-         * Nothing found.
+         * No images.
          */
 
         if (imageFiles.length === 0) {
 
             status.textContent =
-                "No images found in the images folder.";
+                "No images found.";
+
+            gallery.innerHTML = `
+
+                <div class="message">
+
+                    <strong>
+                        No images found
+                    </strong>
+
+                    Put image files inside the
+                    <b>images</b> folder and
+                    refresh the page.
+
+                </div>
+
+            `;
 
             return;
 
@@ -463,11 +573,8 @@ async function loadImages() {
 
 
         /*
-         * Create gallery.
+         * Create a card for every image.
          */
-
-        gallery.innerHTML = "";
-
 
         imageFiles.forEach(file => {
 
@@ -477,7 +584,7 @@ async function loadImages() {
 
 
         /*
-         * Update status.
+         * Update count.
          */
 
         status.textContent =
@@ -490,31 +597,37 @@ async function loadImages() {
             " found";
 
 
-        /*
-         * Hide status after a moment.
-         */
-
-        setTimeout(() => {
-
-            status.style.display =
-                "none";
-
-        }, 1500);
-
     }
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Gallery error:",
+            error
+        );
 
 
-        status.classList.add("error");
+        status.textContent =
+            "Could not load images";
 
 
-        status.innerHTML =
-            "Could not load the images folder.<br>" +
-            "<small>" +
-            escapeHTML(error.message) +
-            "</small>";
+        gallery.innerHTML = `
+
+            <div class="message">
+
+                <strong>
+                    ⚠️ Could not load the gallery
+                </strong>
+
+                ${escapeHTML(error.message)}
+
+                <br><br>
+
+                Make sure the repository and
+                <b>images</b> folder exist.
+
+            </div>
+
+        `;
 
     }
 
@@ -536,15 +649,33 @@ function createImageCard(file) {
 
 
     /*
-     * GitHub provides a direct download URL.
+     * GitHub's raw download URL.
      */
 
-    const imageURL =
+    const rawURL =
         file.download_url;
 
 
     /*
-     * Determine file extension.
+     * URL through GitHub Pages.
+     *
+     * This is same-origin with the gallery,
+     * which makes the download attribute
+     * more reliable.
+     */
+
+    const pagesURL =
+        new URL(
+            IMAGE_FOLDER +
+            "/" +
+            encodeURIComponent(file.name),
+
+            window.location.href
+        ).href;
+
+
+    /*
+     * File extension.
      */
 
     const extension =
@@ -555,44 +686,133 @@ function createImageCard(file) {
 
 
     /*
-     * Build card.
+     * Image area.
      */
 
-    card.innerHTML = `
+    const preview =
+        document.createElement("div");
 
-        <div class="image-preview">
-
-            <img
-                src="${escapeAttribute(imageURL)}"
-                alt="${escapeAttribute(file.name)}"
-                loading="lazy"
-            >
-
-        </div>
+    preview.className =
+        "image-preview";
 
 
-        <div class="image-info">
+    const image =
+        document.createElement("img");
 
-            <p class="image-name">
-                ${escapeHTML(file.name)}
-            </p>
+    image.src =
+        rawURL;
 
-            <p class="image-type">
-                ${extension}
-            </p>
+    image.alt =
+        file.name;
+
+    image.loading =
+        "lazy";
 
 
-            <a
-                class="download-button"
-                href="${escapeAttribute(imageURL)}"
-                download="${escapeAttribute(file.name)}"
-            >
-                Download
-            </a>
+    /*
+     * If GitHub Pages has the image available,
+     * use it. Otherwise keep the raw GitHub URL.
+     */
 
-        </div>
+    image.addEventListener(
+        "error",
+        () => {
 
-    `;
+            if (image.src !== rawURL) {
+
+                image.src =
+                    rawURL;
+
+            }
+
+        }
+    );
+
+
+    preview.appendChild(image);
+
+
+    /*
+     * Information area.
+     */
+
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "image-info";
+
+
+    const name =
+        document.createElement("p");
+
+    name.className =
+        "image-name";
+
+    name.textContent =
+        file.name;
+
+
+    const type =
+        document.createElement("p");
+
+    type.className =
+        "image-type";
+
+    type.textContent =
+        extension;
+
+
+    /*
+     * Download button.
+     */
+
+    const download =
+        document.createElement("a");
+
+    download.className =
+        "download-button";
+
+    download.textContent =
+        "Download";
+
+    download.href =
+        pagesURL;
+
+    download.download =
+        file.name;
+
+
+    /*
+     * Open the raw GitHub version if the
+     * GitHub Pages version isn't available.
+     */
+
+    download.addEventListener(
+        "click",
+        () => {
+
+            setTimeout(() => {
+
+                /*
+                 * The normal Pages URL is used first.
+                 * The browser decides whether to download
+                 * it or display it.
+                 */
+
+            }, 0);
+
+        }
+    );
+
+
+    info.appendChild(name);
+    info.appendChild(type);
+    info.appendChild(download);
+
+
+    card.appendChild(preview);
+    card.appendChild(info);
 
 
     gallery.appendChild(card);
@@ -601,7 +821,7 @@ function createImageCard(file) {
 
 
 /* ==========================================================
-   HTML ESCAPING
+   ESCAPE HTML
    ========================================================== */
 
 function escapeHTML(text) {
@@ -631,15 +851,18 @@ function escapeHTML(text) {
 }
 
 
-function escapeAttribute(text) {
+/* ==========================================================
+   REFRESH BUTTON
+   ========================================================== */
 
-    return escapeHTML(text);
-
-}
+refreshButton.addEventListener(
+    "click",
+    loadImages
+);
 
 
 /* ==========================================================
-   START
+   START GALLERY
    ========================================================== */
 
 loadImages();
@@ -648,34 +871,3 @@ loadImages();
 
 </body>
 </html>
-```
-
-### The only thing you need to change
-
-Near the bottom of the HTML, find:
-
-```js
-const GITHUB_OWNER = "YOUR-GITHUB-USERNAME";
-const GITHUB_REPOSITORY = "YOUR-REPOSITORY-NAME";
-```
-
-For example, if your repository is:
-
-```text
-https://github.com/John123/my-tools
-```
-
-change it to:
-
-```js
-const GITHUB_OWNER = "John123";
-const GITHUB_REPOSITORY = "my-tools";
-```
-
-You **do not** need to change:
-
-```js
-const IMAGE_FOLDER = "images";
-
-
-One limitation: GitHub's public API has a rate limit, so this is great for a personal/small gallery, but it isn't intended for a massive image library.
