@@ -14,7 +14,14 @@
 body {
     margin: 0;
     min-height: 100vh;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
     background: #151515;
     color: #eee;
 }
@@ -36,13 +43,20 @@ header p {
     font-size: 16px;
 }
 
+
+/* =========================
+   CONTROLS
+   ========================= */
+
 .controls {
     width: min(1100px, calc(100% - 30px));
+
     margin: 0 auto 25px;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     gap: 15px;
 }
 
@@ -54,6 +68,7 @@ header p {
 .refresh-button {
     border: 1px solid #444;
     border-radius: 8px;
+
     padding: 9px 14px;
 
     background: #222;
@@ -75,22 +90,39 @@ header p {
     border-color: #666;
 }
 
+
+/* =========================
+   GALLERY
+   ========================= */
+
 .gallery {
     width: min(1100px, calc(100% - 30px));
+
     margin: 0 auto 50px;
 
     display: grid;
+
     grid-template-columns:
-        repeat(auto-fill, minmax(250px, 1fr));
+        repeat(
+            auto-fill,
+            minmax(250px, 1fr)
+        );
 
     gap: 20px;
 }
+
+
+/* =========================
+   IMAGE CARD
+   ========================= */
 
 .image-card {
     overflow: hidden;
 
     background: #222;
+
     border: 1px solid #333;
+
     border-radius: 16px;
 
     transition:
@@ -101,15 +133,23 @@ header p {
 
 .image-card:hover {
     transform: translateY(-4px);
+
     background: #292929;
+
     border-color: #555;
 }
+
+
+/* =========================
+   IMAGE PREVIEW
+   ========================= */
 
 .image-preview {
     width: 100%;
     height: 220px;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -118,10 +158,26 @@ header p {
     background-color: #888;
 
     background-image:
-        linear-gradient(45deg, #aaa 25%, transparent 25%),
-        linear-gradient(-45deg, #aaa 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #aaa 75%),
-        linear-gradient(-45deg, transparent 75%, #aaa 75%);
+        linear-gradient(
+            45deg,
+            #aaa 25%,
+            transparent 25%
+        ),
+        linear-gradient(
+            -45deg,
+            #aaa 25%,
+            transparent 25%
+        ),
+        linear-gradient(
+            45deg,
+            transparent 75%,
+            #aaa 75%
+        ),
+        linear-gradient(
+            -45deg,
+            transparent 75%,
+            #aaa 75%
+        );
 
     background-size: 30px 30px;
 
@@ -141,6 +197,11 @@ header p {
     display: block;
 }
 
+
+/* =========================
+   INFO
+   ========================= */
+
 .image-info {
     padding: 16px;
 }
@@ -158,8 +219,14 @@ header p {
     margin: 0 0 14px;
 
     color: #888;
+
     font-size: 13px;
 }
+
+
+/* =========================
+   DOWNLOAD
+   ========================= */
 
 .download-button {
     display: block;
@@ -179,12 +246,18 @@ header p {
     font-size: 14px;
     font-weight: 650;
 
-    transition: background 0.15s;
+    transition:
+        background 0.15s;
 }
 
 .download-button:hover {
     background: #fff;
 }
+
+
+/* =========================
+   MESSAGE
+   ========================= */
 
 .message {
     grid-column: 1 / -1;
@@ -194,6 +267,7 @@ header p {
     border-radius: 16px;
 
     background: #222;
+
     border: 1px solid #333;
 
     text-align: center;
@@ -207,12 +281,14 @@ header p {
     margin-bottom: 8px;
 
     color: #eee;
+
     font-size: 18px;
 }
 
-.message small {
-    color: #666;
-}
+
+/* =========================
+   BACK BUTTON
+   ========================= */
 
 .back-button {
     display: block;
@@ -226,9 +302,11 @@ header p {
     border-radius: 8px;
 
     background: #222;
+
     border: 1px solid #333;
 
     color: #eee;
+
     text-decoration: none;
 
     font-weight: 600;
@@ -240,8 +318,14 @@ header p {
 
 .back-button:hover {
     background: #292929;
+
     border-color: #555;
 }
+
+
+/* =========================
+   FOOTER
+   ========================= */
 
 footer {
     text-align: center;
@@ -253,6 +337,11 @@ footer {
     padding-bottom: 30px;
 }
 
+
+/* =========================
+   MOBILE
+   ========================= */
+
 @media (max-width: 600px) {
 
     header h1 {
@@ -261,6 +350,7 @@ footer {
 
     .controls {
         align-items: stretch;
+
         flex-direction: column;
     }
 
@@ -271,11 +361,14 @@ footer {
     .gallery {
         grid-template-columns: 1fr;
     }
+
 }
 </style>
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -296,6 +389,7 @@ footer {
     >
         Loading images...
     </div>
+
 
     <button
         class="refresh-button"
@@ -331,208 +425,92 @@ footer {
 
 /*
 ============================================================
-AUTOMATIC GITHUB GALLERY
+AUTOMATIC IMAGE GALLERY
 ============================================================
 
-Repository:
-ThePenguin-boop/UniqueTools
+This gallery does NOT use the GitHub API.
 
-Folder:
-images/
+Instead, GitHub Actions creates:
 
-The gallery asks GitHub for the files inside the folder.
+    images.json
 
-You can add or remove images without editing this HTML.
+whenever the repository changes.
+
+The gallery reads that local file.
+
+This means visitors will NOT use GitHub's API
+and there is no API rate limit problem.
 
 ============================================================
 */
 
 
-const OWNER =
-    "ThePenguin-boop";
-
-const REPOSITORY =
-    "UniqueTools";
-
-const BRANCH =
-    "main";
-
-const FOLDER =
-    "images";
-
-
-const API_URL =
-    "https://api.github.com/repos/" +
-    OWNER +
-    "/" +
-    REPOSITORY +
-    "/contents/" +
-    FOLDER +
-    "?ref=" +
-    BRANCH;
-
-
-const RAW_BASE =
-    "https://raw.githubusercontent.com/" +
-    OWNER +
-    "/" +
-    REPOSITORY +
-    "/" +
-    BRANCH +
-    "/" +
-    FOLDER +
-    "/";
+const IMAGE_FOLDER = "images";
 
 
 const gallery =
     document.getElementById("gallery");
 
+
 const status =
     document.getElementById("status");
+
 
 const refreshButton =
     document.getElementById("refreshButton");
 
 
-const supportedExtensions = [
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".gif",
-    ".webp",
-    ".svg",
-    ".bmp",
-    ".avif"
-];
-
-
 /*
 ============================================================
-LOAD GALLERY
+LOAD IMAGES
 ============================================================
 */
 
-async function loadGallery() {
+async function loadImages() {
 
     gallery.innerHTML = "";
 
     status.textContent =
-        "Checking GitHub for images...";
+        "Loading images...";
 
 
     try {
 
         /*
          * Add a timestamp so the browser doesn't
-         * reuse an old API response.
+         * keep an old images.json in its cache.
          */
-
-        const url =
-            API_URL +
-            "&cacheBust=" +
-            Date.now();
-
 
         const response =
             await fetch(
-                url,
+                "images.json?time=" +
+                Date.now(),
                 {
-                    cache: "no-store",
-
-                    headers: {
-                        "Accept":
-                            "application/vnd.github+json"
-                    }
+                    cache: "no-store"
                 }
             );
 
 
         if (!response.ok) {
 
-            let message =
-                "GitHub API error: " +
-                response.status;
-
-
-            try {
-
-                const data =
-                    await response.json();
-
-                if (data.message) {
-
-                    message =
-                        data.message;
-
-                }
-
-            }
-            catch {
-
-                // Keep default message.
-
-            }
-
-
-            throw new Error(message);
-
-        }
-
-
-        const files =
-            await response.json();
-
-
-        if (!Array.isArray(files)) {
-
             throw new Error(
-                "GitHub did not return a folder."
+                "images.json could not be loaded."
             );
 
         }
 
 
-        /*
-         * Only use actual image files.
-         */
-
         const images =
-            files.filter(file => {
-
-                if (file.type !== "file") {
-
-                    return false;
-
-                }
+            await response.json();
 
 
-                const name =
-                    file.name.toLowerCase();
+        if (!Array.isArray(images)) {
 
+            throw new Error(
+                "images.json is not formatted correctly."
+            );
 
-                return supportedExtensions.some(
-                    extension =>
-                        name.endsWith(extension)
-                );
-
-            });
-
-
-        /*
-         * Alphabetical order.
-         */
-
-        images.sort(
-            (a, b) =>
-                a.name.localeCompare(
-                    b.name,
-                    undefined,
-                    {
-                        numeric: true,
-                        sensitivity: "base"
-                    }
-                )
-        );
+        }
 
 
         /*
@@ -552,11 +530,8 @@ async function loadGallery() {
                         📭 No images found
                     </strong>
 
-                    Upload images into:
-
-                    <br><br>
-
-                    <b>UniqueTools / images</b>
+                    Upload an image to the
+                    <b>images</b> folder.
 
                 </div>
 
@@ -565,6 +540,23 @@ async function loadGallery() {
             return;
 
         }
+
+
+        /*
+         * Sort alphabetically.
+         */
+
+        images.sort(
+            (a, b) =>
+                a.localeCompare(
+                    b,
+                    undefined,
+                    {
+                        numeric: true,
+                        sensitivity: "base"
+                    }
+                )
+        );
 
 
         /*
@@ -583,7 +575,7 @@ async function loadGallery() {
                     ? " image"
                     : " images"
             ) +
-            " found in images/";
+            " found";
 
 
     }
@@ -612,8 +604,8 @@ async function loadGallery() {
                 <br><br>
 
                 <small>
-                    Make sure the repository is public
-                    and the images folder exists.
+                    Make sure the GitHub Actions workflow
+                    has run at least once.
                 </small>
 
             </div>
@@ -627,29 +619,32 @@ async function loadGallery() {
 
 /*
 ============================================================
-CREATE CARD
+CREATE IMAGE CARD
 ============================================================
 */
 
-function createImageCard(file) {
+function createImageCard(filename) {
 
     const card =
         document.createElement("article");
+
 
     card.className =
         "image-card";
 
 
     /*
-     * Use raw.githubusercontent.com directly.
+     * Image URL.
      *
-     * This avoids waiting for GitHub Pages
-     * to deploy the image.
+     * Because gallery.html and images/
+     * are on the same GitHub Pages site,
+     * this is a normal relative URL.
      */
 
-    const rawURL =
-        RAW_BASE +
-        encodeURIComponent(file.name);
+    const imageURL =
+        IMAGE_FOLDER +
+        "/" +
+        encodeURIComponent(filename);
 
 
     /*
@@ -659,6 +654,7 @@ function createImageCard(file) {
     const preview =
         document.createElement("div");
 
+
     preview.className =
         "image-preview";
 
@@ -666,32 +662,17 @@ function createImageCard(file) {
     const image =
         document.createElement("img");
 
+
     image.src =
-        rawURL;
+        imageURL;
+
 
     image.alt =
-        file.name;
+        filename;
+
 
     image.loading =
         "lazy";
-
-
-    /*
-     * If an image somehow fails,
-     * show a broken-image message instead
-     * of crashing the gallery.
-     */
-
-    image.addEventListener(
-        "error",
-        () => {
-
-            image.alt =
-                "Unable to load " +
-                file.name;
-
-        }
-    );
 
 
     preview.appendChild(image);
@@ -704,6 +685,7 @@ function createImageCard(file) {
     const info =
         document.createElement("div");
 
+
     info.className =
         "image-info";
 
@@ -711,15 +693,17 @@ function createImageCard(file) {
     const name =
         document.createElement("p");
 
+
     name.className =
         "image-name";
 
+
     name.textContent =
-        file.name;
+        filename;
 
 
     const extension =
-        file.name
+        filename
             .split(".")
             .pop()
             .toUpperCase();
@@ -728,46 +712,48 @@ function createImageCard(file) {
     const type =
         document.createElement("p");
 
+
     type.className =
         "image-type";
+
 
     type.textContent =
         extension;
 
 
     /*
-     * Download link.
-     *
-     * This points directly at the raw
-     * GitHub file, so it does not depend
-     * on GitHub Pages deploying first.
+     * Download button.
      */
 
     const download =
         document.createElement("a");
 
+
     download.className =
         "download-button";
 
+
     download.href =
-        rawURL;
+        imageURL;
 
-    download.target =
-        "_blank";
 
-    download.rel =
-        "noopener";
+    download.download =
+        filename;
+
 
     download.textContent =
         "Download";
 
 
     info.appendChild(name);
+
     info.appendChild(type);
+
     info.appendChild(download);
 
 
     card.appendChild(preview);
+
     card.appendChild(info);
 
 
@@ -778,29 +764,34 @@ function createImageCard(file) {
 
 /*
 ============================================================
-ESCAPE TEXT
+ESCAPE HTML
 ============================================================
 */
 
 function escapeHTML(text) {
 
     return String(text)
+
         .replaceAll(
             "&",
             "&amp;"
         )
+
         .replaceAll(
             "<",
             "&lt;"
         )
+
         .replaceAll(
             ">",
             "&gt;"
         )
+
         .replaceAll(
             '"',
             "&quot;"
         )
+
         .replaceAll(
             "'",
             "&#039;"
@@ -811,13 +802,13 @@ function escapeHTML(text) {
 
 /*
 ============================================================
-REFRESH
+REFRESH BUTTON
 ============================================================
 */
 
 refreshButton.addEventListener(
     "click",
-    loadGallery
+    loadImages
 );
 
 
@@ -827,7 +818,7 @@ START
 ============================================================
 */
 
-loadGallery();
+loadImages();
 
 </script>
 
